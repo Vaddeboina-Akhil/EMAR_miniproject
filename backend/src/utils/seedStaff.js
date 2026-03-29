@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const Staff = require('../src/models/Staff');
+const Staff = require('../models/Staff');
 
 const staffAccounts = [
   {

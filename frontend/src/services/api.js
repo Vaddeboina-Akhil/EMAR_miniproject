@@ -19,14 +19,22 @@ export const api = {
     return headers;
   },
   post: async (endpoint, data) => {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: api.buildHeaders(true),
-      body: JSON.stringify(data)
-    });
-    const payload = await parseJsonResponse(res);
-    if (!res.ok) throw new Error(payload.message || `Request failed with status ${res.status}`);
-    return payload;
+    console.log(`🌐 POST ${endpoint}`, data);
+    try {
+      const res = await fetch(`${BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: api.buildHeaders(true),
+        body: JSON.stringify(data)
+      });
+      console.log(`📊 Response status: ${res.status} ${res.statusText}`);
+      const payload = await parseJsonResponse(res);
+      console.log(`📦 Parsed response:`, payload);
+      if (!res.ok) throw new Error(payload.message || `Request failed with status ${res.status}`);
+      return payload;
+    } catch (err) {
+      console.error(`❌ API Error on ${endpoint}:`, err);
+      throw err;
+    }
   },
   get: async (endpoint) => {
     const res = await fetch(`${BASE_URL}${endpoint}`, {

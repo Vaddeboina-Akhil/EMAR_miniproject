@@ -27,4 +27,9 @@ const roleMiddleware = (roles) => {
   };
 };
 
-module.exports = { authMiddleware, roleMiddleware };
+// 🔐 Convenience middleware for specific roles
+const allowStaff = roleMiddleware(['staff']);
+const allowDoctor = roleMiddleware(['doctor']);
+const allowPatient = roleMiddleware(['patient']);
+
+module.exports = { authMiddleware, roleMiddleware, allowStaff, allowDoctor, allowPatient };
