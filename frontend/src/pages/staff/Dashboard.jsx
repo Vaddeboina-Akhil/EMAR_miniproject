@@ -48,7 +48,7 @@ const StaffDashboard = () => {
 
   const handleLogout = () => {
     authService.logout();
-    navigate('/');
+    navigate('/staff/login');
   };
 
   return (

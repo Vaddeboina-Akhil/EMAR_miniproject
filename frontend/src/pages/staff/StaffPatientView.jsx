@@ -176,7 +176,7 @@ const StaffPatientView = () => {
 
   const handleLogout = () => {
     authService.logout();
-    navigate('/');
+    navigate('/staff/login');
   };
 
   if (patientLoading) {
