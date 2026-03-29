@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { recordService } from '../../services/apiService';
+import { recordService } from '../../services/recordService';
 import { getUser } from '../../utils/auth';
 import DoctorLayout from '../../components/layout/DoctorLayout';
 
@@ -299,7 +299,7 @@ const PendingApprovals = () => {
   };
 
   return (
-    <DoctorLayout activePage="Approvals">
+    <DoctorLayout activePage="Pending Approvals">
       <div style={{
         padding: '32px',
         maxWidth: '1000px',
