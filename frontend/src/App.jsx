@@ -18,6 +18,7 @@ import DoctorPatientDetails from './pages/doctor/PatientDetails';
 import DoctorPatientProfiles from './pages/doctor/PatientProfiles';
 import DoctorPendingApprovals from './pages/doctor/PendingApprovals';
 import DoctorAddRecord from './pages/doctor/AddRecord';
+import DoctorAccessRequests from './pages/doctor/AccessRequests';
 
 // Staff
 import StaffLogin from './pages/staff/StaffLogin';
@@ -47,6 +48,7 @@ function App() {
       <Route path="/doctor/patient/:id" element={<DoctorPatientDetails />} />
       <Route path="/doctor/pending-approvals" element={<DoctorPendingApprovals />} />
       <Route path="/doctor/add-record" element={<DoctorAddRecord />} />
+      <Route path="/doctor/access-requests" element={<DoctorAccessRequests />} />
 
       {/* Staff — hidden portal */}
       <Route path="/hospital-staff-portal" element={<StaffLogin />} />
