@@ -155,7 +155,7 @@ export const doctorService = {
   },
 
   searchPatients: async (query) => {
-    return api.get(`/doctors/search?q=${query}`);
+    return api.get(`/patient/search?q=${query}`);
   }
 };
 
