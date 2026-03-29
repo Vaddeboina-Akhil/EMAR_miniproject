@@ -9,10 +9,7 @@ const StaffDashboard = () => {
   const [searching, setSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
-  const handleSearch = async (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
+  const performSearch = async (query) => {
     if (query.trim().length < 2) {
       setSearchResults([]);
       setShowSearchResults(false);
@@ -29,6 +26,19 @@ const StaffDashboard = () => {
       setSearchResults([]);
     } finally {
       setSearching(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    performSearch(query);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch(searchQuery);
     }
   };
 
@@ -133,7 +143,8 @@ const StaffDashboard = () => {
                 type="text"
                 value={searchQuery}
                 onChange={handleSearch}
-                placeholder="Enter patient ID (e.g., P-001) or name..."
+                onKeyPress={handleKeyPress}
+                placeholder="Enter patient ID (e.g., P-001) or name... (Press Enter)"
                 style={{
                   width: '100%',
                   padding: '16px 16px',
