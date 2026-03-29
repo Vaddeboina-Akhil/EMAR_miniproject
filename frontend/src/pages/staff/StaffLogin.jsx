@@ -172,6 +172,8 @@ const StaffLogin = () => {
               </label>
               <input
                 type="text"
+                name="username"
+                autocomplete="username"
                 placeholder="e.g., ST-001"
                 value={formData.staffId}
                 onChange={(e) => setFormData({ ...formData, staffId: e.target.value })}
@@ -199,7 +201,6 @@ const StaffLogin = () => {
                   e.target.style.boxShadow = 'none';
                 }}
                 required
-                autoComplete="off"
               />
             </div>
 
@@ -216,6 +217,8 @@ const StaffLogin = () => {
               </label>
               <input
                 type="password"
+                name="password"
+                autocomplete="current-password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -243,7 +246,6 @@ const StaffLogin = () => {
                   e.target.style.boxShadow = 'none';
                 }}
                 required
-                autoComplete="off"
               />
             </div>
 
