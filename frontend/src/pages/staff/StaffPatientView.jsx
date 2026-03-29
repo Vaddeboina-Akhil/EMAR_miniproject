@@ -19,9 +19,8 @@ const StaffPatientView = () => {
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     recordType: 'Prescription',
+    doctorName: '',
     diagnosis: '',
-    medicines: '',
-    notes: '',
     pdfFile: null
   });
 
@@ -66,6 +65,11 @@ const StaffPatientView = () => {
   const handleUploadRecord = async (e) => {
     e.preventDefault();
     
+    if (!formData.doctorName.trim()) {
+      alert('⚠️ Please enter doctor name');
+      return;
+    }
+
     if (!formData.diagnosis.trim()) {
       alert('⚠️ Please enter diagnosis');
       return;
@@ -84,6 +88,7 @@ const StaffPatientView = () => {
     setUploading(true);
     try {
       const staffId = staff?._id || staff?.id;
+      const treatmentDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       
       // Create FormData for file upload
       const formDataObj = new FormData();
@@ -91,8 +96,8 @@ const StaffPatientView = () => {
       formDataObj.append('patientName', patient.name);
       formDataObj.append('recordType', formData.recordType);
       formDataObj.append('diagnosis', formData.diagnosis);
-      formDataObj.append('medicines', formData.medicines || '');
-      formDataObj.append('notes', formData.notes || '');
+      formDataObj.append('doctorName', formData.doctorName);
+      formDataObj.append('visitDate', treatmentDate);
       formDataObj.append('staffId', staffId);
       formDataObj.append('staffName', staff?.name || 'Unknown');
       formDataObj.append('hospitalName', staff?.hospitalName || 'General Hospital');
@@ -104,9 +109,8 @@ const StaffPatientView = () => {
       alert('✅ Record uploaded successfully!');
       setFormData({
         recordType: 'Prescription',
+        doctorName: '',
         diagnosis: '',
-        medicines: '',
-        notes: '',
         pdfFile: null
       });
       setShowUploadForm(false);
@@ -349,11 +353,55 @@ const StaffPatientView = () => {
               </div>
             </div>
 
+            {/* Auto-filled Patient Info */}
+            <div style={{
+              backgroundColor: '#F5F5F5',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '20px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '12px'
+            }}>
+              <div>
+                <div style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase', fontWeight: '600', marginBottom: '4px' }}>
+                  Patient
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>
+                  {patient.name}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase', fontWeight: '600', marginBottom: '4px' }}>
+                  ID
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>
+                  {patient.patientId}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase', fontWeight: '600', marginBottom: '4px' }}>
+                  Hospital
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>
+                  {staff?.hospitalName || 'General Hospital'}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase', fontWeight: '600', marginBottom: '4px' }}>
+                  Record Date
+                </div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#333' }}>
+                  {new Date().toLocaleDateString('en-IN')}
+                </div>
+              </div>
+            </div>
+
             {/* Upload Form */}
-            <form onSubmit={handleUploadRecord} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <form onSubmit={handleUploadRecord} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Record Type */}
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
                   Record Type
                 </label>
                 <select
@@ -361,7 +409,7 @@ const StaffPatientView = () => {
                   onChange={(e) => setFormData({ ...formData, recordType: e.target.value })}
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '10px 12px',
                     border: '2px solid #E0E0E0',
                     borderRadius: '8px',
                     fontSize: '14px',
@@ -384,80 +432,53 @@ const StaffPatientView = () => {
                 </select>
               </div>
 
-              {/* Diagnosis */}
+              {/* Doctor Name */}
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
+                  Doctor Name *
+                </label>
+                <input
+                  type="text"
+                  value={formData.doctorName}
+                  onChange={(e) => setFormData({ ...formData, doctorName: e.target.value })}
+                  placeholder="Enter doctor's full name"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '2px solid #E0E0E0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.2s',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#DC143C'}
+                  onBlur={(e) => e.target.style.borderColor = '#E0E0E0'}
+                />
+              </div>
+
+              {/* Short Diagnosis */}
+              <div>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
                   Diagnosis *
                 </label>
                 <textarea
                   value={formData.diagnosis}
                   onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
-                  placeholder="Medical diagnosis and findings"
+                  placeholder="Brief diagnosis (2 lines max)"
                   required
                   style={{
                     width: '100%',
-                    padding: '12px 16px',
+                    padding: '10px 12px',
                     border: '2px solid #E0E0E0',
                     borderRadius: '8px',
                     fontSize: '14px',
                     boxSizing: 'border-box',
                     fontFamily: 'inherit',
-                    minHeight: '100px',
-                    resize: 'vertical',
-                    transition: 'all 0.2s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#DC143C'}
-                  onBlur={(e) => e.target.style.borderColor = '#E0E0E0'}
-                />
-              </div>
-
-              {/* Medicines */}
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
-                  Medicines & Dosage
-                </label>
-                <textarea
-                  value={formData.medicines}
-                  onChange={(e) => setFormData({ ...formData, medicines: e.target.value })}
-                  placeholder="Medications and dosage instructions"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: '2px solid #E0E0E0',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'inherit',
-                    minHeight: '80px',
-                    resize: 'vertical',
-                    transition: 'all 0.2s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#DC143C'}
-                  onBlur={(e) => e.target.style.borderColor = '#E0E0E0'}
-                />
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
-                  Additional Notes
-                </label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Any additional notes or observations"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: '2px solid #E0E0E0',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'inherit',
-                    minHeight: '80px',
-                    resize: 'vertical',
+                    minHeight: '50px',
+                    resize: 'none',
                     transition: 'all 0.2s',
                     outline: 'none'
                   }}
@@ -468,13 +489,13 @@ const StaffPatientView = () => {
 
               {/* PDF File Upload */}
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
-                  📄 Upload Scanned Copy (PDF) *
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
+                  📄 Upload PDF *
                 </label>
                 <div style={{
                   border: '2px dashed #DC143C',
                   borderRadius: '8px',
-                  padding: '20px',
+                  padding: '16px',
                   textAlign: 'center',
                   backgroundColor: '#FFF5F5',
                   cursor: 'pointer',
@@ -506,22 +527,22 @@ const StaffPatientView = () => {
                   <label htmlFor="pdf-upload" style={{ cursor: 'pointer', display: 'block' }}>
                     {formData.pdfFile ? (
                       <>
-                        <div style={{ fontSize: '20px', marginBottom: '8px' }}>✅</div>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#2E7D32' }}>
+                        <div style={{ fontSize: '18px', marginBottom: '6px' }}>✅</div>
+                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#2E7D32' }}>
                           {formData.pdfFile.name}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                        <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
                           {(formData.pdfFile.size / 1024 / 1024).toFixed(2)} MB
                         </div>
                       </>
                     ) : (
                       <>
-                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>📁</div>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#DC143C', marginBottom: '4px' }}>
-                          Click to select PDF or drag & drop
+                        <div style={{ fontSize: '20px', marginBottom: '6px' }}>📁</div>
+                        <div style={{ fontSize: '13px', fontWeight: '600', color: '#DC143C' }}>
+                          Click or drag PDF here
                         </div>
-                        <div style={{ fontSize: '12px', color: '#666' }}>
-                          Max 10 MB • PDF format only
+                        <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>
+                          Max 10 MB
                         </div>
                       </>
                     )}
@@ -530,7 +551,7 @@ const StaffPatientView = () => {
               </div>
 
               {/* Buttons */}
-              <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
                 <button
                   type="submit"
                   disabled={uploading}
@@ -539,44 +560,44 @@ const StaffPatientView = () => {
                     backgroundColor: '#4CAF50',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '50px',
-                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
                     fontWeight: 'bold',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     cursor: uploading ? 'not-allowed' : 'pointer',
                     opacity: uploading ? 0.6 : 1,
                     transition: 'all 0.2s',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                   }}
                   onMouseEnter={(e) => {
-                    if (!uploading) e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                    if (!uploading) e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
                   }}
                   onMouseLeave={(e) => {
-                    if (!uploading) e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                    if (!uploading) e.target.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
                   }}
                 >
-                  {uploading ? '⏳ Saving...' : '💾 Save as Draft'}
+                  {uploading ? '⏳ Saving...' : '💾 Save Draft'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowUploadForm(false)}
                   style={{
                     flex: 1,
-                    backgroundColor: '#DDD',
+                    backgroundColor: '#F0F0F0',
                     color: '#333',
                     border: 'none',
-                    borderRadius: '50px',
-                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
                     fontWeight: 'bold',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                   }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#CCC'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#DDD'}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#E0E0E0'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#F0F0F0'}
                 >
-                  Cancel
+                  Close
                 </button>
               </div>
             </form>
