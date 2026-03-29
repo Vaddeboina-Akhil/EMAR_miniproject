@@ -300,7 +300,7 @@ const StaffPatientView = () => {
           <button
             onClick={() => setShowUploadForm(!showUploadForm)}
             style={{
-              backgroundColor: showUploadForm ? '#B71C1C' : 'white',
+              backgroundColor: 'white',
               color: '#DC143C',
               borderRadius: '8px',
               padding: '12px 28px',
@@ -519,9 +519,9 @@ const StaffPatientView = () => {
                   onClick={() => setShowUploadForm(false)}
                   style={{
                     flex: 1,
-                    backgroundColor: '#F0F0F0',
+                    backgroundColor: 'white',
                     color: '#333',
-                    border: 'none',
+                    border: '2px solid #DC143C',
                     borderRadius: '8px',
                     padding: '10px 20px',
                     fontWeight: 'bold',
@@ -530,8 +530,14 @@ const StaffPatientView = () => {
                     transition: 'all 0.2s',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
                   }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#E0E0E0'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = '#F0F0F0'}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#FFE6E6';
+                    e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'white';
+                    e.target.style.boxShadow = '0 1px 4px rgba(0,0,0,0.1)';
+                  }}
                 >
                   Close
                 </button>
