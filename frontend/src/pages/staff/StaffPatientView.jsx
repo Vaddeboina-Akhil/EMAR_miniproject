@@ -17,6 +17,8 @@ const StaffPatientView = () => {
   // Doctors data
   const [doctors, setDoctors] = useState([]);
   const [doctorsLoading, setDoctorsLoading] = useState(true);
+  const [searchDoctor, setSearchDoctor] = useState('');
+  const [showDoctorDropdown, setShowDoctorDropdown] = useState(false);
   
   // Upload form
   const [showUploadForm, setShowUploadForm] = useState(false);
@@ -43,8 +45,13 @@ const StaffPatientView = () => {
   const fetchDoctors = async () => {
     try {
       setDoctorsLoading(true);
-      console.log('📡 Fetching doctors list...');
-      const response = await api.get('/doctors/all');
+      const hospital = staff?.hospitalName || '';
+      console.log(`📡 Fetching doctors from hospital: ${hospital}`);
+      
+      const response = await api.get('/doctors/all', {
+        params: { hospital }
+      });
+      
       console.log('✅ Doctors:', response.doctors);
       setDoctors(response.doctors || []);
     } catch (err) {
@@ -149,6 +156,22 @@ const StaffPatientView = () => {
     } finally {
       setUploading(false);
     }
+  };
+
+  // Filter doctors based on search input
+  const filteredDoctors = doctors.filter((doctor) =>
+    doctor.name.toLowerCase().includes(searchDoctor.toLowerCase()) ||
+    doctor.specialization.toLowerCase().includes(searchDoctor.toLowerCase())
+  );
+
+  const handleDoctorSelect = (doctor) => {
+    setFormData({
+      ...formData,
+      doctorId: doctor._id,
+      doctorName: doctor.name
+    });
+    setSearchDoctor('');
+    setShowDoctorDropdown(false);
   };
 
   const handleLogout = () => {
@@ -394,47 +417,117 @@ const StaffPatientView = () => {
                 </select>
               </div>
 
-              {/* Doctor Selection */}
+              {/* Doctor Selection - Searchable Dropdown */}
               <div>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '13px', color: '#333' }}>
                   Doctor *
                 </label>
-                <select
-                  value={formData.doctorId}
-                  onChange={(e) => {
-                    const selectedDoctor = doctors.find(d => d._id === e.target.value);
-                    setFormData({ 
-                      ...formData, 
-                      doctorId: e.target.value,
-                      doctorName: selectedDoctor?.name || ''
-                    });
-                  }}
-                  required
-                  disabled={doctorsLoading}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '2px solid #E0E0E0',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    backgroundColor: 'white',
-                    cursor: doctorsLoading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s',
-                    opacity: doctorsLoading ? 0.6 : 1
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#DC143C'}
-                  onBlur={(e) => e.target.style.borderColor = '#E0E0E0'}
-                >
-                  <option value="">
-                    {doctorsLoading ? '⏳ Loading doctors...' : 'Select a doctor'}
-                  </option>
-                  {doctors.map((doctor) => (
-                    <option key={doctor._id} value={doctor._id}>
-                      {doctor.name} - {doctor.specialization}
-                    </option>
-                  ))}
-                </select>
+                <div style={{ position: 'relative' }}>
+                  {/* Search Input */}
+                  <input
+                    type="text"
+                    placeholder={doctorsLoading ? '⏳ Loading doctors...' : 'Search doctor name or specialty...'}
+                    value={formData.doctorId ? formData.doctorName : searchDoctor}
+                    onChange={(e) => {
+                      setSearchDoctor(e.target.value);
+                      if (formData.doctorId) {
+                        setFormData({ ...formData, doctorId: '', doctorName: '' });
+                      }
+                      setShowDoctorDropdown(true);
+                    }}
+                    onFocus={() => setShowDoctorDropdown(true)}
+                    disabled={doctorsLoading}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '2px solid #E0E0E0',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s',
+                      outline: 'none',
+                      backgroundColor: doctorsLoading ? '#F5F5F5' : 'white',
+                      cursor: doctorsLoading ? 'not-allowed' : 'text',
+                      opacity: doctorsLoading ? 0.6 : 1
+                    }}
+                    onBlur={() => {
+                      if (!formData.doctorId) {
+                        setTimeout(() => setShowDoctorDropdown(false), 200);
+                      }
+                    }}
+                  />
+
+                  {/* Dropdown List */}
+                  {showDoctorDropdown && !doctorsLoading && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      backgroundColor: 'white',
+                      border: '2px solid #DC143C',
+                      borderTop: 'none',
+                      borderRadius: '0 0 8px 8px',
+                      zIndex: 1000,
+                      maxHeight: '250px',
+                      overflowY: 'auto',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                    }}>
+                      {filteredDoctors.length > 0 ? (
+                        filteredDoctors.map((doctor, idx) => (
+                          <div
+                            key={doctor._id}
+                            onClick={() => handleDoctorSelect(doctor)}
+                            style={{
+                              padding: '10px 12px',
+                              backgroundColor: idx % 2 === 0 ? 'white' : '#F9F9F9',
+                              borderBottom: idx < filteredDoctors.length - 1 ? '1px solid #F0F0F0' : 'none',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              ':hover': {
+                                backgroundColor: '#FFE6E6'
+                              }
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FFE6E6'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = idx % 2 === 0 ? 'white' : '#F9F9F9'}
+                          >
+                            <div style={{ fontWeight: '600', fontSize: '13px', color: '#333' }}>
+                              {doctor.name}
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                              {doctor.specialization}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div style={{
+                          padding: '16px 12px',
+                          textAlign: 'center',
+                          color: '#999',
+                          fontSize: '13px'
+                        }}>
+                          {searchDoctor ? '❌ No doctors found' : '📋 No doctors available'}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Selected Doctor Display */}
+                  {formData.doctorId && (
+                    <div style={{
+                      marginTop: '6px',
+                      fontSize: '12px',
+                      color: '#2E7D32',
+                      fontWeight: '600',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}>
+                      ✅ {formData.doctorName} selected
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Short Diagnosis */}

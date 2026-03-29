@@ -207,10 +207,21 @@ exports.addDoctorRecord = async (req, res) => {
 // Get all doctors for dropdown/selection
 exports.getAllDoctors = async (req, res) => {
   try {
-    const doctors = await Doctor.find({ verified: true })
-      .select('_id doctorId name specialization hospitalName email')
+    const { hospital } = req.query;
+    
+    let query = { verified: true };
+    
+    // Filter by hospital if provided
+    if (hospital) {
+      query.hospitalName = hospital;
+      console.log(`🏥 Fetching doctors from hospital: ${hospital}`);
+    }
+    
+    const doctors = await Doctor.find(query)
+      .select('_id doctorId name specialization hospitalName email phone')
       .sort({ name: 1 });
     
+    console.log(`👨‍⚕️ Found ${doctors.length} verified doctors`);
     res.json({ doctors });
   } catch (error) {
     res.status(500).json({ message: error.message });
