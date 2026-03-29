@@ -8,7 +8,7 @@
     "hospitalName": "Apollo Hospitals Chennai",
     "email": "rajesh.kumar@apollo.com",
     "phone": "9876543210",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Yk7xE8B5vQ2nMpL9zR6wI.SecurePass001@",
     "doctorId": "DOC001",
     "verified": true
   },
@@ -21,7 +21,7 @@
     "hospitalName": "Apollo Hospitals Chennai",
     "email": "priya.sharma@apollo.com",
     "phone": "9876543211",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Nj4lQ8X2wV5tB3pK7sH9d.SecurePass002!",
     "doctorId": "DOC002",
     "verified": true
   },
@@ -34,7 +34,7 @@
     "hospitalName": "Apollo Hospitals Chennai",
     "email": "amit.patel@apollo.com",
     "phone": "9876543212",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Pm6uF1rZ9xK4cL8wT5jS.SecurePass003#",
     "doctorId": "DOC003",
     "verified": true
   },
@@ -47,7 +47,7 @@
     "hospitalName": "Apollo Hospitals Chennai",
     "email": "neha.verma@apollo.com",
     "phone": "9876543213",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Ab3fG7hI2jK5lM8nO1pQ.SecurePass004$",
     "doctorId": "DOC004",
     "verified": true
   },
@@ -60,7 +60,7 @@
     "hospitalName": "Fortis Hospital Delhi",
     "email": "vikram.singh@fortis.com",
     "phone": "9876543214",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Cf9dE2wL6qR1sT4uV7xY.SecurePass005%",
     "doctorId": "DOC005",
     "verified": true
   },
@@ -73,7 +73,7 @@
     "hospitalName": "Fortis Hospital Delhi",
     "email": "anjali.desai@fortis.com",
     "phone": "9876543215",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Hz5mK8pN3oQ7rS2tU6vW.SecurePass006^",
     "doctorId": "DOC006",
     "verified": true
   },
@@ -86,7 +86,7 @@
     "hospitalName": "Government Medical College Hospital",
     "email": "mahesh.gupta@gmch.edu",
     "phone": "9876543216",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Jx1aD4eF6gH2iJ5kL8mN.SecurePass007&",
     "doctorId": "DOC007",
     "verified": true
   },
@@ -99,7 +99,7 @@
     "hospitalName": "Government Medical College Hospital",
     "email": "sneha.roy@gmch.edu",
     "phone": "9876543217",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Ow9bP2cQ1rS4tU7vW3xX.SecurePass008*",
     "doctorId": "DOC008",
     "verified": true
   },
@@ -112,7 +112,7 @@
     "hospitalName": "Max Healthcare Delhi",
     "email": "arjun.nair@max.com",
     "phone": "9876543218",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Lq5rS8tU1vW4xY7zZ2aB.SecurePass009(",
     "doctorId": "DOC009",
     "verified": true
   },
@@ -125,7 +125,7 @@
     "hospitalName": "Max Healthcare Delhi",
     "email": "ritu.mishra@max.com",
     "phone": "9876543219",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Mc3nO6pQ9rS2tU5vW8xC.SecurePass010)",
     "doctorId": "DOC010",
     "verified": true
   },
@@ -138,7 +138,7 @@
     "hospitalName": "Lilavati Hospital Mumbai",
     "email": "sanjay.mehta@lilavati.co.in",
     "phone": "9876543220",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Rd7sT1uV4wX9yZ2aB5cD.SecurePass011-",
     "doctorId": "DOC011",
     "verified": true
   },
@@ -151,7 +151,7 @@
     "hospitalName": "Lilavati Hospital Mumbai",
     "email": "kavya.reddy@lilavati.co.in",
     "phone": "9876543221",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Se8tU2vW5xY8zA1bC4dE.SecurePass012=",
     "doctorId": "DOC012",
     "verified": true
   },
@@ -164,7 +164,7 @@
     "hospitalName": "Jaslok Hospital Mumbai",
     "email": "rohit.singh@jaslok.com",
     "phone": "9876543222",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Tf9uV3wX6yZ9aB2cD5eF.SecurePass013+",
     "doctorId": "DOC013",
     "verified": true
   },
@@ -177,7 +177,7 @@
     "hospitalName": "Jaslok Hospital Mumbai",
     "email": "divya.iyer@jaslok.com",
     "phone": "9876543223",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Ug1vW4xY7zA2bC5dE8fG.SecurePass014[",
     "doctorId": "DOC014",
     "verified": true
   },
@@ -190,7 +190,7 @@
     "hospitalName": "AIIMS All India Institute Of Medical Sciences",
     "email": "deepak.joshi@aiims.edu",
     "phone": "9876543224",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Vh2wX5yZ8aB1cD4eF7gH.SecurePass015]",
     "doctorId": "DOC015",
     "verified": true
   },
@@ -203,7 +203,7 @@
     "hospitalName": "AIIMS All India Institute Of Medical Sciences",
     "email": "meera.saxena@aiims.edu",
     "phone": "9876543225",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Wi3xY6zA9bC2dE5fG8hI.SecurePass016;",
     "doctorId": "DOC016",
     "verified": true
   },
@@ -216,7 +216,7 @@
     "hospitalName": "Christian Medical College Vellore",
     "email": "prakash.rao@cmch-vellore.edu",
     "phone": "9876543226",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Xj4yZ7aB8cD1eF4gH9iJ.SecurePass017:",
     "doctorId": "DOC017",
     "verified": true
   },
@@ -229,7 +229,7 @@
     "hospitalName": "Christian Medical College Vellore",
     "email": "lakshmi.prasad@cmch-vellore.edu",
     "phone": "9876543227",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Yk5zA8bB9cD2eE5fG1hI.SecurePass018'",
     "doctorId": "DOC018",
     "verified": true
   },
@@ -242,7 +242,7 @@
     "hospitalName": "King Edward Memorial Hospital",
     "email": "suresh.kumar@kem.edu",
     "phone": "9876543228",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Zl6aB9cC2dD3eE6fG2hI.SecurePass019|",
     "doctorId": "DOC019",
     "verified": true
   },
@@ -255,7 +255,7 @@
     "hospitalName": "King Edward Memorial Hospital",
     "email": "anita.singh@kem.edu",
     "phone": "9876543229",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Am7bC8dD3eE4fF9gG3iJ.SecurePass020_",
     "doctorId": "DOC020",
     "verified": true
   },
@@ -268,7 +268,7 @@
     "hospitalName": "Rajendra Institute of Medical Sciences",
     "email": "vikram@rims.edu.in",
     "phone": "9876543230",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Bn8cD9eE4fG7hH2iI5jK.SecurePass021~",
     "doctorId": "DOC021",
     "verified": true
   },
@@ -281,7 +281,7 @@
     "hospitalName": "Rajendra Institute of Medical Sciences",
     "email": "pooja@rims.edu.in",
     "phone": "9876543231",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Co9dE8fF5gH8iI3jJ6kL.SecurePass022`",
     "doctorId": "DOC022",
     "verified": true
   },
@@ -294,7 +294,7 @@
     "hospitalName": "Artemis Hospital Gurugram",
     "email": "naveen@artemishospital.in",
     "phone": "9876543232",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Dp7eF8gG6hH9iI4jJ7kL.SecurePass023<",
     "doctorId": "DOC023",
     "verified": true
   },
@@ -307,7 +307,7 @@
     "hospitalName": "Artemis Hospital Gurugram",
     "email": "shruti@artemishospital.in",
     "phone": "9876543233",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Eq8fG9hH7iI2jJ5kK8lM.SecurePass024>",
     "doctorId": "DOC024",
     "verified": true
   },
@@ -320,8 +320,21 @@
     "hospitalName": "PD Hinduja National Hospital",
     "email": "ashish@hindujahospital.com",
     "phone": "9876543234",
-    "password": "$2a$10$salt.hash.here",
+    "password": "$2a$10$Fr6gH7iI8jJ3kK6lL9mN.SecurePass025?",
     "doctorId": "DOC025",
+    "verified": true
+  },
+  {
+    "name": "Dr. Rainbow Admin",
+    "dob": "1970-01-01",
+    "age": 54,
+    "licenseId": "MED999",
+    "specialization": "General Surgery",
+    "hospitalName": "Rainbow Hospital",
+    "email": "doctor@rainbowhospital.com",
+    "phone": "9999999999",
+    "password": "$2a$10$Gs9hI8jJ1kK4lL7mM2nO.SecurePass999!",
+    "doctorId": "DOC999",
     "verified": true
   }
 ]

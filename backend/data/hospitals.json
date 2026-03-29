@@ -1,6 +1,7 @@
 [
   {
     "name": "Apollo Hospitals Chennai",
+    "hospitalCode": "APO",
     "address": "439, Greams Road, Chennai",
     "city": "Chennai",
     "state": "Tamil Nadu",
@@ -13,6 +14,7 @@
   },
   {
     "name": "Fortis Hospital Delhi",
+    "hospitalCode": "FOR",
     "address": "B-22, Sector 62, Noida",
     "city": "Noida",
     "state": "Uttar Pradesh",
@@ -25,6 +27,7 @@
   },
   {
     "name": "Government Medical College Hospital",
+    "hospitalCode": "GMC",
     "address": "Medical College Road, Bangalore",
     "city": "Bangalore",
     "state": "Karnataka",
@@ -37,6 +40,7 @@
   },
   {
     "name": "Max Healthcare Delhi",
+    "hospitalCode": "MAX",
     "address": "2, Press Enclave Road, New Delhi",
     "city": "New Delhi",
     "state": "Delhi",
@@ -49,6 +53,7 @@
   },
   {
     "name": "Lilavati Hospital Mumbai",
+    "hospitalCode": "LIL",
     "address": "A-791, Bandra Reclamation, Mumbai",
     "city": "Mumbai",
     "state": "Maharashtra",
@@ -61,6 +66,7 @@
   },
   {
     "name": "Jaslok Hospital Mumbai",
+    "hospitalCode": "JAS",
     "address": "15, New Marine Lines, Mumbai",
     "city": "Mumbai",
     "state": "Maharashtra",
@@ -73,6 +79,7 @@
   },
   {
     "name": "AIIMS All India Institute Of Medical Sciences",
+    "hospitalCode": "AIM",
     "address": "Ansari Nagar, New Delhi",
     "city": "New Delhi",
     "state": "Delhi",
@@ -85,6 +92,7 @@
   },
   {
     "name": "Christian Medical College Vellore",
+    "hospitalCode": "CHR",
     "address": "CMC Vellore, Tamil Nadu",
     "city": "Vellore",
     "state": "Tamil Nadu",
@@ -97,6 +105,7 @@
   },
   {
     "name": "King Edward Memorial Hospital",
+    "hospitalCode": "KEM",
     "address": "Seth Gordhandas Sunderdas Road, Mumbai",
     "city": "Mumbai",
     "state": "Maharashtra",
@@ -109,6 +118,7 @@
   },
   {
     "name": "Rajendra Institute of Medical Sciences",
+    "hospitalCode": "RIM",
     "address": "Bajaj Lane, Indore",
     "city": "Indore",
     "state": "Madhya Pradesh",
@@ -121,6 +131,7 @@
   },
   {
     "name": "Artemis Hospital Gurugram",
+    "hospitalCode": "ART",
     "address": "Sector 51, Gurugram",
     "city": "Gurugram",
     "state": "Haryana",
@@ -133,6 +144,7 @@
   },
   {
     "name": "PD Hinduja National Hospital",
+    "hospitalCode": "PDH",
     "address": "Mahim, Mumbai",
     "city": "Mumbai",
     "state": "Maharashtra",
@@ -145,6 +157,7 @@
   },
   {
     "name": "Sir Ganga Ram Hospital",
+    "hospitalCode": "SGR",
     "address": "Old Rajendra Nagar, New Delhi",
     "city": "New Delhi",
     "state": "Delhi",
@@ -157,6 +170,7 @@
   },
   {
     "name": "Manipal Hospital Bangalore",
+    "hospitalCode": "MAN",
     "address": "Old Airport Road, Bangalore",
     "city": "Bangalore",
     "state": "Karnataka",
@@ -169,6 +183,7 @@
   },
   {
     "name": "St. John's Medical College Hospital",
+    "hospitalCode": "STJ",
     "address": "Sarjapur Road, Bangalore",
     "city": "Bangalore",
     "state": "Karnataka",
@@ -181,6 +196,7 @@
   },
   {
     "name": "Rajiv Gandhi Government Hospital",
+    "hospitalCode": "RGG",
     "address": "Purasawalkam, Chennai",
     "city": "Chennai",
     "state": "Tamil Nadu",
@@ -193,6 +209,7 @@
   },
   {
     "name": "Narayana Health Bangalore",
+    "hospitalCode": "NAR",
     "address": "IT Park Road, Bangalore",
     "city": "Bangalore",
     "state": "Karnataka",
@@ -205,6 +222,7 @@
   },
   {
     "name": "Vivekananda Medical Mission Hospital",
+    "hospitalCode": "VMM",
     "address": "Raja SC Mullick Road, Kolkata",
     "city": "Kolkata",
     "state": "West Bengal",
@@ -217,6 +235,7 @@
   },
   {
     "name": "Institute of Medical Sciences",
+    "hospitalCode": "IMS",
     "address": "Delhi Gate, New Delhi",
     "city": "New Delhi",
     "state": "Delhi",
@@ -229,6 +248,7 @@
   },
   {
     "name": "Global Hospital Chennai",
+    "hospitalCode": "GLO",
     "address": "Perumbakkam, Chennai",
     "city": "Chennai",
     "state": "Tamil Nadu",
@@ -238,5 +258,18 @@
     "email": "info@globalhospital.in",
     "website": "www.globalhospital.in",
     "specialties": ["Cardiology", "Orthopedics", "Oncology", "Neurology"]
+  },
+  {
+    "name": "Rainbow Hospital",
+    "hospitalCode": "RBH",
+    "address": "Tech Park, Cyber City, Hyderabad",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "type": "private",
+    "beds": 600,
+    "phone": "040-6666-9999",
+    "email": "info@rainbowhospital.com",
+    "website": "www.rainbowhospital.com",
+    "specialties": ["Cardiology", "Orthopedics", "Neurology", "General Surgery", "Pediatrics"]
   }
 ]
