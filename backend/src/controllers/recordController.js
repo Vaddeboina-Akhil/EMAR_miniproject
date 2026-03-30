@@ -276,6 +276,57 @@ const getRecordsByDoctor = async (req, res) => {
   }
 };
 
+// 👤 PATIENT: Download record file
+const downloadRecord = async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    console.log(`📥 Download request for record: ${recordId}`);
+    
+    const record = await MedicalRecord.findById(recordId);
+    if (!record) {
+      console.error(`❌ Record not found: ${recordId}`);
+      return res.status(404).json({ message: 'Record not found' });
+    }
+
+    console.log(`✅ Record found: ${record.diagnosis}`);
+
+    // Check if record has a file
+    if (!record.fileUrl) {
+      console.error(`❌ No fileUrl for record: ${recordId}`);
+      return res.status(404).json({ message: 'No file attached to this record' });
+    }
+
+    if (!record.fileName) {
+      console.error(`❌ No fileName for record: ${recordId}`);
+      return res.status(404).json({ message: 'No filename attached to this record' });
+    }
+
+    console.log(`📄 Extracting base64 data for file: ${record.fileName}`);
+
+    // Extract base64 data from fileUrl (format: "data:application/pdf;base64,...")
+    let base64Data = record.fileUrl;
+    
+    // If it starts with data URI format, extract the base64 part
+    if (base64Data.startsWith('data:application/pdf;base64,')) {
+      base64Data = base64Data.replace(/^data:application\/pdf;base64,/, '');
+    }
+    
+    const buffer = Buffer.from(base64Data, 'base64');
+    console.log(`✅ Buffer created: ${buffer.length} bytes`);
+
+    // Set response headers for file download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${record.fileName}"`);
+    res.setHeader('Content-Length', buffer.length);
+
+    console.log(`📤 Sending PDF: ${record.fileName}`);
+    res.send(buffer);
+  } catch (err) {
+    console.error('❌ Download error:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createDraftRecord,
   submitRecord,
@@ -285,5 +336,6 @@ module.exports = {
   getPatientRecords,
   getPendingRecords,
   approveRecord,
-  getRecordsByDoctor
+  getRecordsByDoctor,
+  downloadRecord
 };

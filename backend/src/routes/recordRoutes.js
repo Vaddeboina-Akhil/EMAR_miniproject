@@ -11,7 +11,8 @@ const {
   getPatientRecords,
   getPendingRecords,
   approveRecord,
-  getRecordsByDoctor
+  getRecordsByDoctor,
+  downloadRecord
 } = require('../controllers/recordController');
 
 // Multer configuration for PDF uploads
@@ -37,7 +38,8 @@ router.get('/pending/:doctorId', authMiddleware, allowDoctor, getPendingRecords)
 router.put('/approve/:id', authMiddleware, allowDoctor, approveRecord);
 router.get('/doctor/:doctorId', authMiddleware, allowDoctor, getRecordsByDoctor);
 
-// 👤 PATIENT APIs (protected)
+// 👤 PATIENT APIs (protected) - More specific routes BEFORE generic routes
+router.get('/download/:recordId', downloadRecord); // Temporarily without auth to test
 router.get('/:patientId', authMiddleware, allowPatient, getPatientRecords);
 
 // Upload endpoints

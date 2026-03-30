@@ -96,6 +96,72 @@ const MedicalHistory = () => {
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
   };
 
+  const formatDateWithTime = (dateStr) => {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const date = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' });
+    const time = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${date} at ${time}`;
+  };
+
+  const handleDownloadRecord = async (record) => {
+    try {
+      console.log(`📥 Starting download for record: ${record._id}`, record);
+      
+      const token = localStorage.getItem('emar_token');
+      if (!token) {
+        alert('Authentication token not found. Please login again.');
+        return;
+      }
+
+      const url = `http://localhost:5000/api/records/download/${record._id}`;
+      console.log(`🌐 Fetching from: ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log(`📊 Response status: ${response.status}`);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ Download failed with status ${response.status}:`, errorText);
+        
+        try {
+          const error = JSON.parse(errorText);
+          throw new Error(error.message || `HTTP ${response.status}`);
+        } catch {
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+      }
+      
+      // Create blob and trigger download
+      const blob = await response.blob();
+      console.log(`✅ Blob created: ${blob.size} bytes`);
+      
+      const url_obj = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url_obj;
+      link.download = record.fileName || `${record.diagnosis || 'Medical-Record'}.pdf`;
+      
+      document.body.appendChild(link);
+      console.log(`📥 Triggered download: ${link.download}`);
+      link.click();
+      
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url_obj);
+      
+      console.log(`✅ Download completed successfully`);
+      alert('File downloaded successfully!');
+    } catch (err) {
+      console.error('❌ Download failed:', err);
+      alert(`Failed to download file: ${err.message}`);
+    }
+  };
+
   const handleNav = (page) => {
     const routes = {
       'Overview': '/patient/dashboard',
@@ -291,6 +357,9 @@ const MedicalHistory = () => {
                       <span style={{ color: '#999' }}> · Uploaded by {record.staffName}</span>
                     )}
                   </div>
+                  <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px' }}>
+                    ⏰ Uploaded: {formatDateWithTime(record.createdAt)}
+                  </div>
                   {record.description && (
                     <div style={{
                       fontSize: '13px', color: '#777', fontStyle: 'italic',
@@ -299,6 +368,30 @@ const MedicalHistory = () => {
                     }}>
                       {record.description}
                     </div>
+                  )}
+                  {record.fileUrl && (
+                    <button
+                      onClick={() => handleDownloadRecord(record)}
+                      style={{
+                        marginTop: '8px',
+                        backgroundColor: '#2D6A4F',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#245A40'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = '#2D6A4F'}
+                    >
+                      📥 Download
+                    </button>
                   )}
                 </div>
 
