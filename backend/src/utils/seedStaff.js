@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const Staff = require('../src/models/Staff');
+const Staff = require('../models/Staff');
 
 const staffAccounts = [
   {
@@ -38,6 +38,15 @@ const staffAccounts = [
     hospitalName: 'Yashoda Hospital',
     email: 'suresh.babu@yashoda.com',
     phone: '9876543004',
+    password: 'Staff@123',
+    role: 'staff'
+  },
+  {
+    name: 'Neha Singh',
+    staffId: 'ST-005',
+    hospitalName: 'Rainbow Hospital',
+    email: 'neha.singh@rainbowhospital.com',
+    phone: '9876543005',
     password: 'Staff@123',
     role: 'staff'
   }

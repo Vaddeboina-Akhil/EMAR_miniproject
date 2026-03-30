@@ -35,16 +35,17 @@ const AddRecord = () => {
     if (!form.diagnosis.trim()) { alert('Please enter a diagnosis'); return; }
     setSubmitting(true);
     try {
-      await api.post('/records/upload', {
+      await api.post('/records/prescription', {
         patientId,
         patientName,
         recordType: form.recordType,
         diagnosis: form.diagnosis,
-        description: form.description + (form.medicines ? `\n\nMedicines: ${form.medicines}` : ''),
+        medicines: form.medicines,
+        notes: form.description,
         visitDate: form.visitDate,
+        doctorId: doctor?._id,
         doctorName: doctor?.name,
-        hospitalName: doctor?.hospitalName,
-        status: 'approved', // doctor-added records are auto-approved
+        hospitalName: doctor?.hospitalName
       });
       setSuccess(true);
       setTimeout(() => {

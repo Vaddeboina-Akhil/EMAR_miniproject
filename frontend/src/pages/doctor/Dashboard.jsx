@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DoctorLayout from '../../components/layout/DoctorLayout';
 import { getUser } from '../../utils/auth';
+import { recordService } from '../../services/recordService';
 import { api } from '../../services/api';
 
 const DoctorDashboard = () => {
@@ -13,8 +14,10 @@ const DoctorDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (user?._id) {
+      fetchStats();
+    }
+  }, [user?._id]);
 
   const formatRelativeTime = (dateStr) => {
     if (!dateStr) return '—';
@@ -29,25 +32,25 @@ const DoctorDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const doctorId = user?._id || user?.id;
+      setLoading(true);
+      const doctorId = user?._id;
 
       // 1. Pending records (staff-uploaded, awaiting doctor approval)
-      const pendingRes = await api.get(`/records/pending/${doctorId}`);
-      const pending = Array.isArray(pendingRes) ? pendingRes : [];
-      setPendingRecords(pending.slice(0, 3));
+      const pending = await recordService.getPendingRecords(doctorId);
+      setPendingRecords(Array.isArray(pending) ? pending.slice(0, 3) : []);
 
       // 2. Records added BY this doctor → derive unique patient count
       let doctorRecords = [];
       let myPatientIds = new Set();
       try {
-        const drRes = await api.get(`/records/doctor/${doctorId}`);
+        const drRes = await recordService.getDoctorRecords(doctorId);
         doctorRecords = Array.isArray(drRes) ? drRes : [];
         doctorRecords.forEach(r => {
           const pid = r.patientId?._id || r.patientId;
           if (pid) myPatientIds.add(String(pid));
         });
       } catch (e) {
-        console.warn('Doctor records endpoint not ready:', e.message);
+        console.warn('Doctor records endpoint:', e.message);
       }
 
       // 3. Access requests sent by this doctor

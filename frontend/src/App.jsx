@@ -22,6 +22,7 @@ import DoctorAccessRequests from './pages/doctor/AccessRequests';
 
 // Staff
 import StaffLogin from './pages/staff/StaffLogin';
+import StaffDashboard from './pages/staff/Dashboard';
 import SearchPatient from './pages/staff/SearchPatient';
 import StaffPatientView from './pages/staff/StaffPatientView';
 import StaffUploadRecord from './pages/staff/UploadRecord';
@@ -52,6 +53,8 @@ function App() {
 
       {/* Staff — hidden portal */}
       <Route path="/hospital-staff-portal" element={<StaffLogin />} />
+      <Route path="/staff/login" element={<StaffLogin />} />
+      <Route path="/staff/dashboard" element={<StaffDashboard />} />
       <Route path="/staff/search" element={<SearchPatient />} />
       <Route path="/staff/patient/:id" element={<StaffPatientView />} />
       <Route path="/staff/upload" element={<StaffUploadRecord />} />

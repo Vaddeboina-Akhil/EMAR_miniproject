@@ -198,6 +198,8 @@ const Login = () => {
             </label>
             <input
               type="text"
+              name="username"
+              autocomplete="username"
               placeholder={config.placeholder1}
               value={formData.id}
               onChange={(e) => setFormData({ ...formData, id: e.target.value })}
@@ -220,6 +222,8 @@ const Login = () => {
             </label>
             <input
               type="password"
+              name="password"
+              autocomplete="current-password"
               placeholder="Enter Password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}

@@ -25,7 +25,7 @@ const DoctorLayout = ({ children, activePage = 'Dashboard' }) => {
       minHeight: '100vh', display: 'flex', flexDirection: 'column',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       backgroundColor: '#F0F4F8'
-    }}>
+    }} className="doctor-scrollbar">
       {/* Navbar */}
       <div style={{
         height: '60px', backgroundColor: 'white',

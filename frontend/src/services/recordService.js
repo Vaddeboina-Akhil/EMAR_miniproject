@@ -1,4 +1,4 @@
-import api from './api';
+import { api } from './api';
 
 export const recordService = {
   // Add new medical record
@@ -32,7 +32,20 @@ export const recordService = {
 
   // Bulk operations
   getRecordsByDateRange: (patientId, startDate, endDate) => 
-    api.get(`/patients/${patientId}/records?start=${startDate}&end=${endDate}`)
+    api.get(`/patients/${patientId}/records?start=${startDate}&end=${endDate}`),
+
+  // Pending records (doctor approval workflow)
+  getPendingRecords: (doctorId) => api.get(`/records/pending/${doctorId}`),
+  
+  approveRecord: (recordId) => api.put(`/records/approve/${recordId}`, { status: 'approved' }),
+  
+  rejectRecord: (recordId, reason) => api.put(`/records/approve/${recordId}`, { status: 'rejected', rejectionReason: reason }),
+
+  // Doctor-created prescriptions
+  createPrescription: (prescriptionData) => api.post(`/records/prescription`, prescriptionData),
+
+  // Doctor's own records
+  getDoctorRecords: (doctorId) => api.get(`/records/doctor/${doctorId}`)
 };
 
 export default recordService;

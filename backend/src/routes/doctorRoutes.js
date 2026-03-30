@@ -3,6 +3,9 @@ const router = express.Router();
 const { authMiddleware, roleMiddleware } = require('../middleware/authMiddleware');
 const doctorController = require('../controllers/doctorController');
 
+// Public endpoint to get all doctors (for staff doctor selection)
+router.get('/all', doctorController.getAllDoctors);
+
 router.use(authMiddleware, roleMiddleware(['doctor']));
 
 router.get('/me', doctorController.getDoctorProfile);

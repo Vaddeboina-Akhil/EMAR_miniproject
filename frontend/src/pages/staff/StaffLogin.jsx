@@ -1,205 +1,344 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../../services/api';
+import { authService } from '../../services/apiService';
 
 const StaffLogin = () => {
   const [formData, setFormData] = useState({ staffId: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     try {
-      const result = await api.post('/auth/staff/login', {
-        staffId: formData.staffId,
-        password: formData.password,
-      });
-      if (result.token) {
-        localStorage.setItem('emar_token', result.token);
-        localStorage.setItem('emar_role', 'staff');
-        navigate('/staff/search');
-      } else {
-        alert(result.message || 'Login failed');
-      }
-    } catch (error) {
-      alert(error.message || 'Login failed. Please check your credentials.');
-    } finally {
+      console.log('🔐 Starting login for:', formData.staffId);
+      const result = await authService.staffLogin(formData.staffId, formData.password);
+      console.log('✅ Login successful:', result);
+      setTimeout(() => navigate('/staff/dashboard'), 500);
+    } catch (err) {
+      console.error('❌ Login error:', err);
+      setError(err.message || 'Login failed. Please check your credentials.');
       setLoading(false);
     }
   };
 
-  const inputStyle = {
-    width: '100%',
-    padding: '14px 22px',
-    borderRadius: '50px',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    border: 'none',
-    color: 'white',
-    fontSize: '16px',
-    outline: 'none',
-    boxSizing: 'border-box',
-  };
-
-  const labelStyle = {
-    fontWeight: 'bold',
-    color: 'white',
-    fontSize: '16px',
-    display: 'block',
-    marginBottom: '8px',
-  };
-
   return (
     <div style={{
-      height: '100vh',
+      minHeight: '100vh',
       display: 'flex',
       overflow: 'hidden',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      background: 'linear-gradient(135deg, #B30000 0%, #8B0000 100%)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
-      <style>{`input::placeholder { color: rgba(255,255,255,0.55) !important; }`}</style>
-
-      {/* LEFT HALF */}
+      {/* LEFT SIDE - ILLUSTRATION (Hidden on mobile) */}
       <div style={{
-        flex: '0 0 45%',
-        backgroundColor: '#F0F4F8',
+        flex: 1,
+        backgroundColor: 'white',
         position: 'relative',
         overflow: 'hidden',
+        alignItems: 'center',
+        justifyContent: 'center',
+        display: window.innerWidth >= 1024 ? 'flex' : 'none'
       }}>
-        {/* Logo */}
-        <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
-          <img src="/images/logo-red.png" alt="EMAR" style={{ height: '48px', objectFit: 'contain' }} />
-        </div>
-
-        {/* White blob */}
-        <svg viewBox="0 0 500 700" preserveAspectRatio="none" style={{
-          position: 'absolute', top: 0, left: 0,
-          width: '100%', height: '100%', zIndex: 1,
-        }}>
-          <path d="M0,0 L320,0 Q480,100 490,350 Q480,600 320,700 L0,700 Z" fill="white" />
-        </svg>
-
-        {/* Illustration */}
+        {/* Decorative gradient blobs */}
         <div style={{
-          position: 'absolute', zIndex: 2,
-          bottom: '60px', left: '40px', width: '320px',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '384px',
+          height: '384px',
+          backgroundColor: '#FFEBEE',
+          borderRadius: '9999px',
+          opacity: 0.3,
+          filter: 'blur(96px)',
+          pointerEvents: 'none'
+        }}></div>
+        <div style={{
+          position: 'absolute',
+          bottom: '-80px',
+          left: '-80px',
+          width: '320px',
+          height: '320px',
+          backgroundColor: '#FFF5F5',
+          borderRadius: '9999px',
+          opacity: 0.4,
+          filter: 'blur(64px)',
+          pointerEvents: 'none'
+        }}></div>
+
+        {/* Logo positioned absolute */}
+        <div style={{
+          position: 'absolute',
+          top: '24px',
+          left: '24px',
+          zIndex: 10
         }}>
           <img
-            src="/images/staff-illustration.png"
-            alt="Staff illustration"
-            style={{ width: '100%', objectFit: 'contain' }}
+            src="/images/logo-red.png"
+            alt="EMAR"
+            style={{ height: '32px', objectFit: 'contain' }}
           />
         </div>
 
-        {/* Secret portal badge */}
+        {/* Staff Illustration - centered */}
+        <div style={{ position: 'relative', zIndex: 5 }}>
+          <img
+            src="/images/staff-illustration.png"
+            alt="Medical Staff"
+            style={{
+              width: '320px',
+              height: 'auto',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.1))'
+            }}
+          />
+        </div>
+
+        {/* Bottom accent text */}
         <div style={{
-          position: 'absolute', bottom: '24px', right: '24px', zIndex: 10,
-          backgroundColor: '#B71C1C', color: 'white',
-          fontSize: '11px', fontWeight: 'bold',
-          padding: '6px 14px', borderRadius: '50px',
-          letterSpacing: '1px',
+          position: 'absolute',
+          bottom: '32px',
+          left: 0,
+          right: 0,
+          textAlign: 'center'
         }}>
-          🔐 INTERNAL ACCESS ONLY
+          <p style={{
+            fontSize: '14px',
+            color: '#999',
+            fontWeight: '500'
+          }}>Hospital Staff Portal</p>
         </div>
       </div>
 
-      {/* RIGHT HALF */}
+      {/* RIGHT SIDE - LOGIN FORM */}
       <div style={{
         flex: 1,
-        backgroundColor: '#7B1C1C',
-        padding: '60px',
         display: 'flex',
-        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
+        padding: window.innerWidth >= 1024 ? '48px 32px' : '48px 16px'
       }}>
-        <div style={{ marginBottom: '8px' }}>
-          <span style={{
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            color: 'white', fontSize: '12px',
-            fontWeight: 'bold', letterSpacing: '2px',
-            padding: '6px 16px', borderRadius: '50px',
+        <div style={{ width: '100%', maxWidth: '448px' }}>
+          {/* Mobile Logo */}
+          {window.innerWidth < 1024 && (
+            <div style={{
+              marginBottom: '32px',
+              textAlign: 'center'
+            }}>
+              <img
+                src="/images/logo-red.png"
+                alt="EMAR"
+                style={{
+                  height: '28px',
+                  objectFit: 'contain'
+                }}
+              />
+            </div>
+          )}
+
+          {/* Heading */}
+          <div style={{
+            marginBottom: '32px',
+            textAlign: 'center'
           }}>
-            HOSPITAL STAFF PORTAL
-          </span>
+            <h1 style={{
+              fontSize: '36px',
+              fontWeight: 'bold',
+              color: 'white',
+              margin: '0 0 12px 0'
+            }}>Login</h1>
+            <p style={{
+              color: '#FFB3B3',
+              fontSize: '14px',
+              fontWeight: '500',
+              margin: 0
+            }}>Access your hospital staff dashboard</p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Staff ID Input */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'white',
+                marginBottom: '12px'
+              }}>
+                Staff ID
+              </label>
+              <input
+                type="text"
+                name="username"
+                autocomplete="username"
+                placeholder="e.g., ST-001"
+                value={formData.staffId}
+                onChange={(e) => setFormData({ ...formData, staffId: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  border: '2px solid rgba(255, 255, 255, 0.4)',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  transition: 'all 0.2s'
+                }}
+                onFocus={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.borderColor = 'white';
+                  e.target.style.boxShadow = '0 0 0 4px rgba(255, 255, 255, 0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                  e.target.style.boxShadow = 'none';
+                }}
+                required
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'white',
+                marginBottom: '12px'
+              }}>
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  border: '2px solid rgba(255, 255, 255, 0.4)',
+                  borderRadius: '8px',
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  boxSizing: 'border-box',
+                  outline: 'none',
+                  transition: 'all 0.2s'
+                }}
+                onFocus={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.borderColor = 'white';
+                  e.target.style.boxShadow = '0 0 0 4px rgba(255, 255, 255, 0.2)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                  e.target.style.boxShadow = 'none';
+                }}
+                required
+              />
+            </div>
+
+            {/* Error Alert */}
+            {error && (
+              <div style={{
+                padding: '16px',
+                backgroundColor: 'rgba(153, 0, 0, 0.4)',
+                border: '2px solid rgba(255, 100, 100, 0.6)',
+                borderRadius: '8px'
+              }}>
+                <p style={{
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  margin: 0
+                }}>⚠️ {error}</p>
+              </div>
+            )}
+
+            {/* Test Credentials Info */}
+            <div style={{
+              padding: '12px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '8px'
+            }}>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '12px',
+                fontWeight: '500',
+                margin: 0,
+                lineHeight: '1.6'
+              }}>
+                <span style={{ display: 'block', marginBottom: '6px' }}>Test Credentials:</span>
+                <span style={{ display: 'block' }}>ID: <span style={{ fontWeight: 'bold' }}>ST-001</span></span>
+                <span style={{ display: 'block' }}>Pass: <span style={{ fontWeight: 'bold' }}>Staff@123</span></span>
+              </p>
+            </div>
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                backgroundColor: '#000',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                borderRadius: '9999px',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+                boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.2s',
+                transform: loading ? 'scale(0.98)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = '#222';
+                  e.target.style.boxShadow = '0 15px 30px rgba(0, 0, 0, 0.4)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = '#000';
+                  e.target.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.3)';
+                }
+              }}
+            >
+              {loading ? '⏳ Logging in...' : '🔐 Login Securely'}
+            </button>
+          </form>
+
+          {/* Footer */}
+          <div style={{
+            marginTop: '32px',
+            textAlign: 'center',
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontSize: '12px'
+          }}>
+            <p style={{ margin: 0 }}>Secure Hospital Staff Portal • EMAR v1.0</p>
+          </div>
         </div>
-
-        <h1 style={{
-          fontSize: '52px', fontWeight: '900',
-          color: 'white', marginBottom: '8px',
-          lineHeight: '1.1', marginTop: '16px',
-        }}>
-          Staff Login
-        </h1>
-
-        <p style={{
-          color: 'rgba(255,255,255,0.65)',
-          fontSize: '15px', marginBottom: '36px',
-        }}>
-          Authorized hospital staff only.<br />
-          All access is monitored and blockchain-audited.
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Staff ID</label>
-            <input
-              type="text"
-              placeholder="e.g., ST-001"
-              value={formData.staffId}
-              onChange={(e) => setFormData({ ...formData, staffId: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <div style={{ marginBottom: '28px' }}>
-            <label style={labelStyle}>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              style={inputStyle}
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%', height: '56px',
-              borderRadius: '50px',
-              backgroundColor: loading ? 'rgba(255,255,255,0.3)' : '#E53935',
-              color: 'white', fontSize: '20px',
-              fontWeight: 'bold', border: 'none',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'background-color 0.3s ease',
-            }}
-          >
-            {loading ? 'Signing in...' : 'Sign in as Staff'}
-          </button>
-        </form>
-
-        <p style={{
-          color: 'rgba(255,255,255,0.4)',
-          textAlign: 'center', marginTop: '32px', fontSize: '12px',
-        }}>
-          Not a staff member?{' '}
-          <span
-            onClick={() => navigate('/')}
-            style={{ color: 'rgba(255,255,255,0.7)', cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            Go to patient / doctor login
-          </span>
-        </p>
-
-        <p style={{
-          color: 'rgba(255,255,255,0.25)',
-          textAlign: 'center', marginTop: '12px', fontSize: '11px',
-        }}>
-          © 2025 EMAR — All access is encrypted and blockchain-audited
-        </p>
       </div>
+
+      <style>{`
+        input::placeholder {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      `}</style>
     </div>
   );
 };

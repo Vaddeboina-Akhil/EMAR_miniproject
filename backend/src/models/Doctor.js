@@ -7,6 +7,7 @@ const doctorSchema = new mongoose.Schema({
   licenseId: { type: String, required: true, unique: true },
   specialization: { type: String, required: true },
   hospitalName: { type: String, required: true },
+  hospitalId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital' },
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
   // Optional base64 image sent by the signup UI.
