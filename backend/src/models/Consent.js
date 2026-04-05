@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const consentSchema = new mongoose.Schema({
-  patientId: { type: String, required: true },
+  patientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', required: true },
   patientEmail: { type: String },
-  doctorId: { type: String },
+  doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' },
   doctorName: { type: String },
   hospitalName: { type: String },
   reason: { type: String },

@@ -57,7 +57,9 @@ const getConsentsByDoctor = async (req, res) => {
   try {
     const { doctorId } = req.params;
     const consents = await Consent.find({ doctorId })
-      .sort({ createdAt: -1 });
+      .populate('patientId', 'name patientId email')
+      .populate('doctorId', 'name hospitalName')
+      .sort({ requestDate: -1 });
     res.json(consents);
   } catch (err) {
     res.status(500).json({ message: err.message });

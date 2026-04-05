@@ -121,17 +121,7 @@ exports.getPendingApprovals = async (req, res) => {
       status: 'pending'
     }).sort({ createdAt: -1 });
 
-    res.json({
-      pending: pendingRecords.map((record) => ({
-        id: record._id,
-        patient: record.patientName || record.patientId,
-        doctor: doctor.name,
-        purpose: record.recordType || 'Medical update',
-        records: [record.diagnosis, record.description].filter(Boolean),
-        date: formatDate(record.createdAt),
-        expires: null
-      }))
-    });
+    res.json(pendingRecords);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

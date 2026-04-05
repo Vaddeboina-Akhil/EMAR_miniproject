@@ -142,7 +142,7 @@ const DoctorDashboard = () => {
 
       <div style={{ flex: 1, color: 'white' }}>
         <div style={{ fontSize: '26px', fontWeight: '900', marginBottom: '6px' }}>{user?.name || 'Doctor Name'}</div>
-        <div style={{ fontSize: '14px', opacity: 0.85, marginBottom: '4px', fontWeight: '600' }}>Doctor ID: &nbsp;<span style={{ opacity: 1 }}>{user?.doctorId || 'MED—'}</span></div>
+        <div style={{ fontSize: '14px', opacity: 0.85, marginBottom: '4px', fontWeight: '600' }}>License ID: &nbsp;<span style={{ opacity: 1 }}>{user?.licenseId || 'MED—'}</span></div>
         <div style={{ fontSize: '14px', opacity: 0.85, marginBottom: '4px', fontWeight: '600' }}>Specialization: &nbsp;<span style={{ opacity: 1 }}>{user?.specialization || '—'}</span></div>
         <div style={{ fontSize: '14px', opacity: 0.85, marginBottom: '4px', fontWeight: '600' }}>Age: &nbsp;<span style={{ opacity: 1 }}>{user?.age || '—'}</span></div>
         <div style={{ fontSize: '14px', opacity: 0.85, fontWeight: '600' }}>Hospital Name: &nbsp;<span style={{ opacity: 1 }}>{user?.hospitalName || '—'}</span></div>

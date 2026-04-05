@@ -145,10 +145,10 @@ const DoctorAccessRequests = () => {
                       </div>
                       <div>
                         <div style={{ fontWeight: 'bold', fontSize: '17px', color: '#111' }}>
-                          {consent.patientName || 'Unknown Patient'}
+                          {typeof consent.patientId === 'object' ? consent.patientId?.name : consent.patientName || 'Unknown Patient'}
                         </div>
                         <div style={{ fontSize: '13px', color: '#666', marginTop: '2px' }}>
-                          Requested: {formatDate(consent.createdAt)}
+                          Requested: {formatDate(consent.requestDate)}
                         </div>
                       </div>
                     </div>
@@ -173,7 +173,7 @@ const DoctorAccessRequests = () => {
                         Patient ID
                       </div>
                       <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>
-                        {consent.patientId || '—'}
+                        {typeof consent.patientId === 'object' ? consent.patientId?.patientId : consent.patientId || '—'}
                       </div>
                     </div>
                     <div>

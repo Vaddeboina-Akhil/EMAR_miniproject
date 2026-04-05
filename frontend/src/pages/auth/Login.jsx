@@ -6,7 +6,7 @@ import { api } from '../../services/api';
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState('patient');
   const [displayRole, setDisplayRole] = useState('patient');
-  const [animState, setAnimState] = useState('idle'); // 'idle' | 'exit' | 'enter'
+  const [animState, setAnimState] = useState('idle');
   const [slideDir, setSlideDir] = useState('left');
   const [formData, setFormData] = useState({ id: '', password: '' });
   const navigate = useNavigate();
@@ -34,7 +34,6 @@ const Login = () => {
     setSlideDir(dir);
     setAnimState('exit');
     setSelectedRole(newRole);
-    // After exit animation (300ms), swap image and play enter animation
     setTimeout(() => {
       setDisplayRole(newRole);
       setAnimState('enter');
@@ -42,8 +41,7 @@ const Login = () => {
     }, 300);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
       if (selectedRole === 'patient') {
         const result = await api.post('/auth/patient/login', { aadhaarId: formData.id, password: formData.password });
@@ -116,8 +114,6 @@ const Login = () => {
         flex: '0 0 45%', backgroundColor: '#F0F4F8',
         position: 'relative', overflow: 'hidden'
       }}>
-
-        {/* Logo — animates with role switch */}
         <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10, ...getAnimStyle() }}>
           <img
             src={displayRole === 'patient' ? '/images/logo-green.png' : '/images/logo-blue.png'}
@@ -126,7 +122,6 @@ const Login = () => {
           />
         </div>
 
-        {/* White blob */}
         <svg viewBox="0 0 500 700" preserveAspectRatio="none" style={{
           position: 'absolute', top: 0, left: 0,
           width: '100%', height: '100%', zIndex: 1
@@ -134,7 +129,6 @@ const Login = () => {
           <path d="M0,0 L320,0 Q480,100 490,350 Q480,600 320,700 L0,700 Z" fill="white" />
         </svg>
 
-        {/* Illustration — animates with role switch */}
         <div style={{
           position: 'absolute', zIndex: 2,
           bottom: '150px', left: '120px', width: '320px',
@@ -154,7 +148,7 @@ const Login = () => {
         backgroundColor: roleColors[selectedRole],
         padding: '60px',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        transition: 'background-color 0.4s ease'
+        transition: animState === 'idle' ? 'background-color 0.4s ease' : 'none'
       }}>
         <h1 style={{
           fontSize: '52px', fontWeight: '900',
@@ -163,7 +157,6 @@ const Login = () => {
           Login as
         </h1>
 
-        {/* Role Tabs */}
         <div style={{
           backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: '50px',
           padding: '4px', display: 'flex', marginBottom: '32px', width: 'fit-content'
@@ -187,8 +180,7 @@ const Login = () => {
           ))}
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
+        <div>
           <div style={{ marginBottom: '16px' }}>
             <label style={{
               fontWeight: 'bold', color: 'white',
@@ -199,7 +191,7 @@ const Login = () => {
             <input
               type="text"
               name="username"
-              autocomplete="username"
+              autoComplete="username"
               placeholder={config.placeholder1}
               value={formData.id}
               onChange={(e) => setFormData({ ...formData, id: e.target.value })}
@@ -209,7 +201,6 @@ const Login = () => {
                 border: 'none', color: 'white', fontSize: '16px',
                 outline: 'none', boxSizing: 'border-box'
               }}
-              required
             />
           </div>
 
@@ -223,7 +214,7 @@ const Login = () => {
             <input
               type="password"
               name="password"
-              autocomplete="current-password"
+              autoComplete="current-password"
               placeholder="Enter Password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -233,23 +224,32 @@ const Login = () => {
                 border: 'none', color: 'white', fontSize: '16px',
                 outline: 'none', boxSizing: 'border-box'
               }}
-              required
             />
           </div>
 
-          <button
-            type="submit"
+          <div
+            role="button"
+            onClick={handleSubmit}
             style={{
-              width: '100%', height: '56px', borderRadius: '50px',
+              width: '100%',
+              height: '56px',
+              borderRadius: '50px',
               backgroundColor: buttonColors[selectedRole],
-              color: 'white', fontSize: '20px', fontWeight: 'bold',
-              border: 'none', cursor: 'pointer',
-              transition: 'background-color 0.4s ease'
+              color: 'white',
+              fontSize: '20px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              userSelect: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background-color 0.4s ease',
             }}
           >
             Login Securely
-          </button>
-        </form>
+          </div>
+        </div>
 
         <p style={{ color: 'white', textAlign: 'center', marginTop: '20px', fontSize: '14px' }}>
           Don't have an account?{' '}

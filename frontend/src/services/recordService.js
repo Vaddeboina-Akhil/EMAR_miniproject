@@ -35,7 +35,7 @@ export const recordService = {
     api.get(`/patients/${patientId}/records?start=${startDate}&end=${endDate}`),
 
   // Pending records (doctor approval workflow)
-  getPendingRecords: (doctorId) => api.get(`/records/pending/${doctorId}`),
+  getPendingRecords: (doctorId) => api.get(`/doctors/pending-approvals`),
   
   approveRecord: (recordId) => api.put(`/records/approve/${recordId}`, { status: 'approved' }),
   

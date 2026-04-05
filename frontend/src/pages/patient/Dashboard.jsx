@@ -6,10 +6,11 @@ import { api } from '../../services/api';
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
-  const user = getUser();
+  const userFromStorage = getUser();
+  const [userProfile, setUserProfile] = useState(userFromStorage);
   
   // 🔐 Validate that the logged-in user is actually a patient
-  if (!user || user.role !== 'patient') {
+  if (!userFromStorage || userFromStorage.role !== 'patient') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -43,26 +44,34 @@ const PatientDashboard = () => {
     );
   }
 
-  const age = user?.dob ? calculateAge(user.dob) : user?.age || '—';
+  const age = userProfile?.dob ? calculateAge(userProfile.dob) : userProfile?.age || '—';
 
   const [stats, setStats] = useState({ recordsCount: 0, accessLogsCount: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const patientId = user?._id || user?.id;
+        const patientId = userFromStorage?._id || userFromStorage?.id;
         if (!patientId) return;
-        const data = await api.get(`/patient/stats/${patientId}`);
-        if (data?.stats) setStats(data.stats);
+        
+        // Fetch fresh profile data from database
+        const profileData = await api.get(`/patient/profile/${patientId}`);
+        if (profileData?.patient) {
+          setUserProfile(profileData.patient);
+        }
+        
+        // Fetch stats
+        const statsData = await api.get(`/patient/stats/${patientId}`);
+        if (statsData?.stats) setStats(statsData.stats);
       } catch (err) {
-        console.error('Failed to fetch stats:', err);
+        console.error('Failed to fetch data:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchStats();
-  }, []);
+    fetchData();
+  }, [userFromStorage]);
 
   const allergiesList = user?.allergies
     ? user.allergies.split(',').map(a => a.trim()).filter(Boolean)

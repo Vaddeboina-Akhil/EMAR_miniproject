@@ -95,6 +95,14 @@ input[type=number] {
   color: white;
 }
 
+button::selection {
+  background: transparent;
+}
+
+button::-moz-selection { /* Firefox */
+  background: transparent;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
