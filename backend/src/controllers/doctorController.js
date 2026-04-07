@@ -328,58 +328,98 @@ exports.getPendingRecords = async (req, res) => {
 };
 
 // 📊 Get recent activity for this doctor
-exports.getRecentActivity = async (req, res) => {
+// 📊 Get dashboard stats: patient count, access requests, pending approvals
+exports.getDashboardStats = async (req, res) => {
   try {
     const doctorId = req.user._id || req.user.id;
-    const AccessLog = require('../models/AccessLog');
 
-    // Get recent access logs for this doctor (limit 5)
-    const recentLogs = await AccessLog.find({
+    // 1. Count ALL access requests (pending + approved + rejected)
+    const accessRequests = await Consent.countDocuments({
       doctorId: doctorId
-    })
-      .populate('patientId', 'name patientId')
-      .sort({ timestamp: -1 })
-      .limit(5);
-
-    // Map logs to activity format
-    const activities = recentLogs.map(log => {
-      const patientName = log.patientId?.name || 'Unknown Patient';
-      let action = 'Unknown action';
-
-      if (log.accessType === 'ACCESS_APPROVED') {
-        action = `Access granted by ${patientName}`;
-      } else if (log.accessType === 'ACCESS_REQUESTED') {
-        action = `You requested access for ${patientName}`;
-      } else if (log.accessType === 'RECORD_APPROVED') {
-        action = `Record approved for ${patientName}`;
-      } else if (log.accessType === 'RECORD_UPLOADED') {
-        action = `Record uploaded by ${patientName}`;
-      }
-
-      return {
-        id: log._id,
-        action,
-        actionType: log.accessType,
-        patientName,
-        patientId: log.patientId?._id,
-        timestamp: log.timestamp,
-        icon: getActivityIcon(log.accessType)
-      };
     });
 
-    res.json({ activities });
+    // 2. Count approved patients only
+    const myPatients = await Consent.countDocuments({
+      doctorId: doctorId,
+      status: 'approved'
+    });
+
+    // 3. Count pending approvals
+    const doctor = await Doctor.findById(doctorId);
+    let pendingApprovals = 0;
+    if (doctor) {
+      pendingApprovals = await MedicalRecord.countDocuments({
+        hospitalName: doctor.hospitalName,
+        status: 'pending'
+      });
+    }
+
+    res.json({
+      accessRequests,
+      myPatients,
+      pendingApprovals
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Helper function to get activity icon
-const getActivityIcon = (actionType) => {
-  const iconMap = {
-    'ACCESS_APPROVED': '✅',
-    'ACCESS_REQUESTED': '📋',
-    'RECORD_APPROVED': '📄',
-    'RECORD_UPLOADED': '📤'
-  };
-  return iconMap[actionType] || '📝';
+// 🕐 Get recent activity combining consents and records
+exports.getRecentActivity = async (req, res) => {
+  try {
+    const doctorId = req.user._id || req.user.id;
+
+    // 1. Get approved access requests (consents)
+    const approvedConsents = await Consent.find({
+      doctorId: doctorId,
+      status: 'approved'
+    })
+      .populate('patientId', 'name patientId')
+      .sort({ responseDate: -1 })
+      .limit(5);
+
+    // 2. Get recently uploaded records by this doctor
+    const recordsUploaded = await MedicalRecord.find({
+      doctorId: doctorId
+    })
+      .populate('patientId', 'name')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    // 3. Format consent activities
+    const consentActivities = approvedConsents.map(consent => ({
+      type: 'ACCESS_APPROVED',
+      patientName: consent.patientId?.name || 'Unknown Patient',
+      timestamp: consent.responseDate || consent.updatedAt || consent.createdAt,
+      icon: '✅',
+      action: `Access granted by ${consent.patientId?.name || 'Unknown Patient'}`
+    }));
+
+    // 4. Format record activities
+    const recordActivities = recordsUploaded.map(record => ({
+      type: 'RECORD_UPLOADED',
+      patientName: record.patientId?.name || record.patientName || 'Unknown Patient',
+      timestamp: record.createdAt,
+      icon: '📄',
+      action: `Record uploaded for ${record.patientId?.name || record.patientName || 'Unknown Patient'}`
+    }));
+
+    // 5. Combine and sort by timestamp (newest first)
+    const combined = [...consentActivities, ...recordActivities]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 5)
+      .map(activity => ({
+        action: activity.action,
+        patientName: activity.patientName,
+        timestamp: activity.timestamp,
+        icon: activity.icon,
+        actionType: activity.type
+      }));
+
+    res.json({ activities: combined.length > 0 ? combined : [] });
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    res.status(500).json({ message: error.message });
+  }
 };
+

@@ -13,6 +13,7 @@ router.get('/dashboard', doctorController.getDoctorDashboard);
 router.get('/me/patients', doctorController.getDoctorPatients);
 
 // 📊 Dashboard Stats APIs
+router.get('/dashboard-stats', doctorController.getDashboardStats); // Combined stats
 router.get('/my-patients', doctorController.getMyPatients); // Get approved patients count
 router.get('/access-requests', doctorController.getAccessRequests); // Get all access requests
 router.get('/pending-records', doctorController.getPendingRecords); // Get pending approvals

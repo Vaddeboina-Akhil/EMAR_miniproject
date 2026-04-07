@@ -70,25 +70,15 @@ const DoctorDashboard = () => {
     try {
       setLoading(true);
 
-      // 1. Fetch My Patients (approved consents)
-      let myPatientsCount = 0;
+      // 1. Fetch combined dashboard stats (all counts)
+      let statsData = { accessRequests: 0, myPatients: 0, pendingApprovals: 0 };
       try {
-        const myPatientsRes = await api.get('/doctors/my-patients');
-        myPatientsCount = Array.isArray(myPatientsRes) ? myPatientsRes.length : 0;
+        statsData = await api.get('/doctors/dashboard-stats');
       } catch (e) {
-        console.warn('Failed to fetch my patients:', e.message);
+        console.warn('Failed to fetch dashboard stats:', e.message);
       }
 
-      // 2. Fetch Access Requests
-      let accessRequestsCount = 0;
-      try {
-        const requestsRes = await api.get('/doctors/access-requests');
-        accessRequestsCount = requestsRes?.total || (Array.isArray(requestsRes?.requests) ? requestsRes.requests.length : 0);
-      } catch (e) {
-        console.warn('Failed to fetch access requests:', e.message);
-      }
-
-      // 3. Fetch Pending Records
+      // 2. Fetch Pending Records for preview
       let pendingRecordsData = [];
       try {
         const pendingRes = await api.get('/doctors/pending-records');
@@ -99,7 +89,7 @@ const DoctorDashboard = () => {
         setPendingRecords([]);
       }
 
-      // 4. Fetch Recent Activity
+      // 3. Fetch Recent Activity with proper patient names
       let activitiesData = [];
       try {
         const activityRes = await api.get('/doctors/recent-activity');
@@ -110,9 +100,9 @@ const DoctorDashboard = () => {
 
       // Update stats
       setStats({
-        pendingRecords: pendingRecordsData.length,
-        totalPatients: myPatientsCount,
-        accessRequests: accessRequestsCount,
+        pendingRecords: statsData.pendingApprovals || 0,
+        totalPatients: statsData.myPatients || 0,
+        accessRequests: statsData.accessRequests || 0,
       });
 
       // Format activity data for display
