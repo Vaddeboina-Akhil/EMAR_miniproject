@@ -217,3 +217,71 @@ exports.getAllDoctors = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// 👥 Get doctor's approved patients (MY PATIENTS)
+exports.getMyPatients = async (req, res) => {
+  try {
+    const doctorId = req.user._id || req.user.id;
+    
+    // Get all APPROVED consents for this doctor
+    const approvedConsents = await Consent.find({
+      doctorId: doctorId,
+      status: 'approved'
+    }).populate('patientId', 'name patientId email');
+
+    res.json(approvedConsents);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 👤 Get MY patient details (no second request needed)
+exports.getMyPatientDetails = async (req, res) => {
+  try {
+    const doctorId = req.user._id || req.user.id;
+    const { patientId } = req.params;
+    const mongoose = require('mongoose');
+
+    // Convert patientId to ObjectId
+    let patientObjectId;
+    try {
+      patientObjectId = new mongoose.Types.ObjectId(patientId);
+    } catch (e) {
+      return res.status(400).json({ message: 'Invalid patient ID format' });
+    }
+
+    // Verify doctor has APPROVED consent for this patient
+    const consent = await Consent.findOne({
+      doctorId: doctorId,
+      patientId: patientObjectId,
+      status: 'approved'
+    });
+
+    if (!consent) {
+      return res.status(403).json({ message: 'You do not have approved access to this patient' });
+    }
+
+    // Get patient details
+    const patient = await Patient.findById(patientObjectId).select('-password');
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    // Get patient records
+    const records = await MedicalRecord.find({
+      patientId: patientObjectId,
+      status: { $ne: 'rejected' }
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      patient,
+      records,
+      consent: {
+        status: consent.status,
+        approvedAt: consent.responseDate
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

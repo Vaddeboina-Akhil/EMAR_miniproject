@@ -24,6 +24,7 @@ import PatientPrescriptions from './pages/patient/Prescriptions';
 import DoctorDashboard from './pages/doctor/Dashboard';
 import DoctorSearchPatient from './pages/doctor/PatientList';
 import DoctorPatientDetails from './pages/doctor/PatientDetails';
+import DoctorMyPatientDetails from './pages/doctor/DoctorMyPatientDetails';
 import DoctorPatientProfiles from './pages/doctor/PatientProfiles';
 import DoctorPendingApprovals from './pages/doctor/PendingApprovals';
 import DoctorAddRecord from './pages/doctor/AddRecord';
@@ -64,6 +65,7 @@ function App() {
       <Route path="/doctor/overview" element={<DoctorDashboard />} />
       <Route path="/doctor/search" element={<DoctorSearchPatient />} />
       <Route path="/doctor/patient-management" element={<DoctorPatientProfiles />} />
+      <Route path="/doctor/my-patient/:id" element={<DoctorMyPatientDetails />} />
       <Route path="/doctor/patient/:id" element={<DoctorPatientDetails />} />
       <Route path="/doctor/pending-approvals" element={<DoctorPendingApprovals />} />
       <Route path="/doctor/add-record" element={<DoctorAddRecord />} />
