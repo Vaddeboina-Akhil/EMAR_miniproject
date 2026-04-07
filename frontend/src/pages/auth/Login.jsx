@@ -87,6 +87,7 @@ const Login = () => {
           
           console.log('💾 Setting localStorage token...');
           localStorage.setItem('emar_token', result.token);
+          localStorage.setItem('emar_role', 'doctor');
           console.log('✅ Token saved to localStorage');
           
           console.log('👤 Calling setUser...');
@@ -111,6 +112,7 @@ const Login = () => {
         console.log('✅ Patient login result:', result);
         if (result.token) {
           localStorage.setItem('emar_token', result.token);
+          localStorage.setItem('emar_role', 'patient');
           setUser(result.user);
           clearTimeout(timeout);
           navigate('/patient/dashboard');

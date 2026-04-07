@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DoctorLayout from '../../components/layout/DoctorLayout';
-import { getUser } from '../../utils/auth';
+import { getUser, getRole } from '../../utils/auth';
 import { recordService } from '../../services/recordService';
 import { api } from '../../services/api';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const user = getUser();
+  const userRole = getRole();
   
   // 🔐 Validate that the logged-in user is actually a doctor
-  if (!user || user.role !== 'doctor') {
+  if (!user || !userRole || userRole !== 'doctor') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',

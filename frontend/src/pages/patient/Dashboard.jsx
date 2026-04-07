@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientLayout from '../../components/layout/PatientLayout';
-import { getUser, calculateAge } from '../../utils/auth';
+import { getUser, getRole, calculateAge } from '../../utils/auth';
 import { api } from '../../services/api';
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const userFromStorage = getUser();
+  const userRole = getRole();
   const [userProfile, setUserProfile] = useState(userFromStorage);
   
   // 🔐 Validate that the logged-in user is actually a patient
-  if (!userFromStorage || userFromStorage.role !== 'patient') {
+  if (!userFromStorage || !userRole || userRole !== 'patient') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',

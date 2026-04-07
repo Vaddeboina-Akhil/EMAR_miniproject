@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientLayout from '../../components/layout/PatientLayout';
-import { getUser } from '../../utils/auth';
+import { getUser, getRole } from '../../utils/auth';
 import { api } from '../../services/api';
 
 const PatientAuditTrail = () => {
   const navigate = useNavigate();
   const user = getUser();
+  const userRole = getRole();
 
   // 🔐 Validate that the logged-in user is actually a patient
-  if (!user || user.role !== 'patient') {
+  if (!user || !userRole || userRole !== 'patient') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
