@@ -35,6 +35,7 @@ const AdminLogin = () => {
       console.log('✅ Admin login successful:', result);
       
       localStorage.setItem('emar_token', result.token);
+      localStorage.setItem('emar_role', 'admin');
       setUser(result.user);
       
       console.log('📍 Navigating to admin dashboard...');

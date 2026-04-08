@@ -16,6 +16,8 @@ const StaffLogin = () => {
       console.log('🔐 Starting login for:', formData.staffId);
       const result = await authService.staffLogin(formData.staffId, formData.password);
       console.log('✅ Login successful:', result);
+      console.log('🏥 Hospital Name from API:', result.user?.hospitalName);
+      console.log('📋 Full user object:', result.user);
       setTimeout(() => navigate('/staff/dashboard'), 500);
     } catch (err) {
       console.error('❌ Login error:', err);

@@ -242,8 +242,13 @@ const StaffPatientView = () => {
         alignItems: 'center',
         boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
       }}>
-        <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#DC143C', letterSpacing: '1px' }}>
-          EMAR
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div style={{ fontSize: '26px', fontWeight: 'bold', color: '#DC143C', letterSpacing: '1px' }}>
+            EMAR
+          </div>
+          <div style={{ fontSize: '12px', color: '#666', fontWeight: '500' }}>
+            🏥 {staff?.hospitalName || 'Hospital'}
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -478,7 +483,7 @@ const StaffPatientView = () => {
                         filteredDoctors.map((doctor, idx) => (
                           <div
                             key={doctor._id}
-                            onClick={() => handleDoctorSelect(doctor)}
+                            onMouseDown={() => handleDoctorSelect(doctor)}
                             style={{
                               padding: '10px 12px',
                               backgroundColor: idx % 2 === 0 ? 'white' : '#F9F9F9',

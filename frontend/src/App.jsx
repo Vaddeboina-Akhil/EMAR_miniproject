@@ -19,6 +19,7 @@ import PatientConsentPage from './pages/patient/ConsentPage';
 import PatientRequestAccess from './pages/patient/RequestAccess';
 import PatientAuditTrail from './pages/patient/AuditTrail';
 import PatientPrescriptions from './pages/patient/Prescriptions';
+import EditPatientProfile from './pages/patient/EditProfile';
 
 // Doctor
 import DoctorDashboard from './pages/doctor/Dashboard';
@@ -40,11 +41,15 @@ import StaffUploadRecord from './pages/staff/UploadRecord';
 function App() {
   return (
     <Routes>
-      {/* Auth */}
-      <Route path="/" element={<Login />} />
+      {/* Auth - New Landing Page Structure */}
+      <Route path="/" element={<Login role="patient" />} />
+      <Route path="/login" element={<Login role="patient" />} />
+      <Route path="/login/doctor" element={<Login role="doctor" />} />
+      <Route path="/login/patient" element={<Login role="patient" />} />
       <Route path="/signup" element={<Signup />} />
 
-      {/* Admin — hidden portal */}
+      {/* Admin — hidden secret portal */}
+      <Route path="/emar-admin-portal" element={<AdminLogin />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/doctors" element={<AdminDoctors />} />
@@ -55,6 +60,7 @@ function App() {
 
       {/* Patient */}
       <Route path="/patient/dashboard" element={<PatientDashboard />} />
+      <Route path="/patient/edit-profile" element={<EditPatientProfile />} />
       <Route path="/patient/medical-records" element={<PatientMedicalHistory />} />
       <Route path="/patient/consent" element={<PatientConsentPage />} />
       <Route path="/patient/request-access" element={<PatientRequestAccess />} />
@@ -71,9 +77,10 @@ function App() {
       <Route path="/doctor/add-record" element={<DoctorAddRecord />} />
       <Route path="/doctor/access-requests" element={<DoctorAccessRequests />} />
 
-      {/* Staff — hidden portal */}
-      <Route path="/hospital-staff-portal" element={<StaffLogin />} />
+      {/* Staff — hidden secret portal */}
+      <Route path="/hospital-staff-exclusive" element={<StaffLogin />} />
       <Route path="/staff/login" element={<StaffLogin />} />
+      <Route path="/hospital-staff-portal" element={<StaffLogin />} />
       <Route path="/staff/dashboard" element={<StaffDashboard />} />
       <Route path="/staff/search" element={<SearchPatient />} />
       <Route path="/staff/patient/:id" element={<StaffPatientView />} />

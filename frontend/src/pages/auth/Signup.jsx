@@ -126,6 +126,7 @@ const Signup = () => {
         });
         if (result.token) {
           localStorage.setItem('emar_token', result.token);
+          localStorage.setItem('emar_role', 'patient');
           setUser(result.user);
           navigate('/patient/dashboard');
         } else { alert(result.message || 'Signup failed'); }
@@ -139,6 +140,7 @@ const Signup = () => {
       });
       if (result.token) {
         localStorage.setItem('emar_token', result.token);
+        localStorage.setItem('emar_role', 'doctor');
         setUser(result.user);
         navigate('/doctor/overview');
       } else { alert(result.message || 'Signup failed'); }

@@ -33,5 +33,10 @@ router.get('/logs', authMiddleware, allowAdmin, adminController.listLogs);
 router.post('/security/detect-suspicious', authMiddleware, allowAdmin, adminController.detectSuspiciousActivity);
 router.get('/security/suspicious-records', authMiddleware, allowAdmin, adminController.getSuspiciousRecords);
 
+// ============= SYSTEM FREEZE/UNFREEZE (BLOCKCHAIN SECURITY) =============
+router.get('/system/status', authMiddleware, allowAdmin, adminController.getSystemStatus);
+router.post('/system/freeze', authMiddleware, allowAdmin, adminController.freezeSystem);
+router.post('/system/unfreeze', authMiddleware, allowAdmin, adminController.unfreezeSystem);
+
 module.exports = router;
 

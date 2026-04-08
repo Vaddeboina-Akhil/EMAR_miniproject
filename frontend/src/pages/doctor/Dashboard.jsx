@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DoctorLayout from '../../components/layout/DoctorLayout';
-import { getUser } from '../../utils/auth';
+import { getUser, getRole } from '../../utils/auth';
 import { recordService } from '../../services/recordService';
 import { api } from '../../services/api';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const user = getUser();
+  const userRole = getRole();
   
   // 🔐 Validate that the logged-in user is actually a doctor
-  if (!user || user.role !== 'doctor') {
+  if (!user || !userRole || userRole !== 'doctor') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -69,76 +70,52 @@ const DoctorDashboard = () => {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const doctorId = user?._id;
 
-      // 1. Pending records (staff-uploaded, awaiting doctor approval)
-      const pending = await recordService.getPendingRecords(doctorId);
-      setPendingRecords(Array.isArray(pending) ? pending.slice(0, 3) : []);
-
-      // 2. Records added BY this doctor → derive unique patient count
-      let doctorRecords = [];
-      let myPatientIds = new Set();
+      // 1. Fetch combined dashboard stats (all counts)
+      let statsData = { accessRequests: 0, myPatients: 0, pendingApprovals: 0 };
       try {
-        const drRes = await recordService.getDoctorRecords(doctorId);
-        doctorRecords = Array.isArray(drRes) ? drRes : [];
-        doctorRecords.forEach(r => {
-          const pid = r.patientId?._id || r.patientId;
-          if (pid) myPatientIds.add(String(pid));
-        });
+        statsData = await api.get('/doctors/dashboard-stats');
       } catch (e) {
-        console.warn('Doctor records endpoint:', e.message);
+        console.warn('Failed to fetch dashboard stats:', e.message);
       }
 
-      // 3. Access requests sent by this doctor
-      let consents = [];
+      // 2. Fetch Pending Records for preview
+      let pendingRecordsData = [];
       try {
-        const consentRes = await api.get(`/consent/doctor/${doctorId}`);
-        consents = Array.isArray(consentRes) ? consentRes : [];
+        const pendingRes = await api.get('/doctors/pending-records');
+        pendingRecordsData = Array.isArray(pendingRes?.records) ? pendingRes.records : [];
+        setPendingRecords(pendingRecordsData.slice(0, 3));
       } catch (e) {
-        console.warn('Doctor consents endpoint not ready:', e.message);
+        console.warn('Failed to fetch pending records:', e.message);
+        setPendingRecords([]);
       }
 
-      // 4. Build recent activity from real data
-      const activity = [];
-
-      consents
-        .filter(c => c.status === 'approved')
-        .slice(0, 2)
-        .forEach(c => {
-          activity.push({
-            icon: '🔓',
-            text: `Access granted by ${c.patientName || 'a patient'}`,
-            time: formatRelativeTime(c.updatedAt || c.createdAt),
-          });
-        });
-
-      doctorRecords.slice(0, 2).forEach(r => {
-        activity.push({
-          icon: '💊',
-          text: `Prescription added for ${r.patientName || 'a patient'}`,
-          time: formatRelativeTime(r.createdAt),
-        });
-      });
-
-      if (pending.length > 0) {
-        activity.push({
-          icon: '📋',
-          text: `${pending.length} record${pending.length > 1 ? 's' : ''} awaiting your approval`,
-          time: 'Now',
-        });
+      // 3. Fetch Recent Activity with proper patient names
+      let activitiesData = [];
+      try {
+        const activityRes = await api.get('/doctors/recent-activity');
+        activitiesData = Array.isArray(activityRes?.activities) ? activityRes.activities : [];
+      } catch (e) {
+        console.warn('Failed to fetch recent activity:', e.message);
       }
 
+      // Update stats
       setStats({
-        pendingRecords: pending.length,
-        totalPatients: myPatientIds.size,
-        accessRequests: consents.length,
+        pendingRecords: statsData.pendingApprovals || 0,
+        totalPatients: statsData.myPatients || 0,
+        accessRequests: statsData.accessRequests || 0,
       });
 
-      setRecentActivity(
-        activity.length > 0
-          ? activity.slice(0, 4)
-          : [{ icon: '✅', text: 'No recent activity yet', time: '' }]
-      );
+      // Format activity data for display
+      const displayActivity = activitiesData.length > 0
+        ? activitiesData.slice(0, 4).map(a => ({
+          icon: a.icon || '📝',
+          text: a.action,
+          time: formatRelativeTime(a.timestamp),
+        }))
+        : [{ icon: '✅', text: 'No recent activity yet', time: '' }];
+
+      setRecentActivity(displayActivity);
 
     } catch (err) {
       console.error('Failed to fetch dashboard stats:', err);

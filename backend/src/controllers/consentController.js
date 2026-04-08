@@ -1,5 +1,6 @@
 const Consent = require('../models/Consent');
 const AccessLog = require('../models/AccessLog');
+const AuditLog = require('../models/AuditLog');
 const mongoose = require('mongoose');
 
 const requestAccess = async (req, res) => {
@@ -14,6 +15,19 @@ const requestAccess = async (req, res) => {
       accessType: 'requested',
       timestamp: new Date()
     });
+    // 📝 Save audit log for patient
+    if (consent.doctorId) {
+      await AuditLog.create({
+        patientId: consent.patientId,
+        actor_entity: consent.doctorName || 'Unknown Doctor',
+        action_type: 'requested',
+        affected_resource: 'medical_records',
+        metadata: {
+          reason: consent.reason,
+          recordType: 'medical'
+        }
+      });
+    }
     res.status(201).json(consent);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -47,6 +61,21 @@ const respondConsent = async (req, res) => {
         accessType: status,
         timestamp: new Date()
       });
+      // 📝 Save audit log for patient
+      if (consent.doctorId) {
+        await AuditLog.create({
+          patientId: consent.patientId,
+          actor_entity: 'Patient',
+          action_type: status === 'approved' ? 'approved' : 'denied',
+          affected_resource: 'medical_records',
+          metadata: {
+            reason: status === 'approved' 
+              ? 'Patient approved access to medical records'
+              : 'Patient rejected access request',
+            recordType: 'medical'
+          }
+        });
+      }
     }
     res.json(consent);
   } catch (err) {
@@ -238,4 +267,60 @@ const migrateAccessLogs = async (req, res) => {
   }
 };
 
-module.exports = { requestAccess, getPatientConsents, respondConsent, getAccessLogs, getConsentsByDoctor, seedTestLogs, migrateAccessLogs, getAccessLogStats };
+// ✅ NEW — Get audit logs for a patient (both old AccessLogs and new AuditLogs)
+const getAuditLogs = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    
+    // Try to find patient by custom patientId or MongoDB _id
+    const Patient = require('../models/Patient');
+    let patientObjectId = null;
+    
+    // First try to find by custom patientId field
+    const patientByCustomId = await Patient.findOne({ patientId }).lean();
+    if (patientByCustomId) {
+      patientObjectId = patientByCustomId._id;
+    } else {
+      // Try as MongoDB ObjectId directly
+      if (mongoose.Types.ObjectId.isValid(patientId)) {
+        patientObjectId = new mongoose.Types.ObjectId(patientId);
+      }
+    }
+    
+    if (!patientObjectId) {
+      return res.json([]); // Return empty if patient not found
+    }
+
+    // Fetch new audit logs
+    const auditLogs = await AuditLog.find({ patientId: patientObjectId }).lean();
+
+    // Fetch old access logs and transform them to match new format
+    const accessLogs = await AccessLog.find({ patientId: patientObjectId }).lean();
+    const transformedAccessLogs = accessLogs.map(log => ({
+      _id: log._id,
+      patientId: log.patientId,
+      actor_entity: log.doctorName || log.actor || 'Unknown',
+      action_type: log.accessType || log.action_type || 'view',
+      affected_resource: log.recordsAccessed || 'medical_records',
+      metadata: {
+        reason: log.reason || '',
+        ipAddress: log.ipAddress || ''
+      },
+      timestamp: log.timestamp || log.createdAt || new Date()
+    }));
+
+    // Combine both logs and sort by timestamp (newest first)
+    const allLogs = [...auditLogs, ...transformedAccessLogs].sort((a, b) => {
+      const timeA = a.timestamp ? new Date(a.timestamp) : new Date(0);
+      const timeB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+      return timeB - timeA;
+    });
+
+    res.json(allLogs);
+  } catch (err) {
+    console.error('Error fetching audit logs:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { requestAccess, getPatientConsents, respondConsent, getAccessLogs, getConsentsByDoctor, seedTestLogs, migrateAccessLogs, getAccessLogStats, getAuditLogs };

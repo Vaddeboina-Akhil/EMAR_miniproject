@@ -1,6 +1,10 @@
 const MedicalRecord = require('../models/MedicalRecord');
 const Doctor = require('../models/Doctor');
 const AccessLog = require('../models/AccessLog');
+const AuditLog = require('../models/AuditLog');
+const { storeRecordHash } = require('../services/blockchainService');
+const { generateRecordHash, verifyRecordIntegrity } = require('../utils/hashUtils');
+const SystemStatus = require('../models/SystemStatus');
 
 // 📋 STAFF: Create record in DRAFT status
 const createDraftRecord = async (req, res) => {
@@ -39,6 +43,16 @@ const submitRecord = async (req, res) => {
     const record = await MedicalRecord.findById(id);
 
     if (!record) return res.status(404).json({ message: 'Record not found' });
+    
+    // 🔒 Check if record is frozen
+    if (record.isFrozen) {
+      return res.status(403).json({ 
+        message: 'Cannot modify frozen record',
+        reason: record.flagReason,
+        isFrozen: true
+      });
+    }
+    
     if (record.status !== 'draft') {
       return res.status(400).json({ message: 'Only draft records can be submitted' });
     }
@@ -70,6 +84,16 @@ const getStaffRecords = async (req, res) => {
 // STAFF UPLOAD: Staff uploads records (requires doctor approval)
 const uploadRecord = async (req, res) => {
   try {
+    // 🔒 Check if system is frozen
+    const system = await SystemStatus.findOne();
+    if (system?.isFrozen) {
+      return res.status(403).json({
+        message: 'System is frozen by admin. Record uploads are temporarily disabled.',
+        reason: system.reason,
+        isFrozen: true
+      });
+    }
+
     const {
       patientId, patientName, recordType, diagnosis,
       medicines, notes, hospitalName, staffId, staffName, doctorId, doctorName, visitDate
@@ -121,6 +145,15 @@ const uploadRecord = async (req, res) => {
       fileSize
     });
 
+    // � BLOCKCHAIN: Store record hash on blockchain for tamper detection
+    const recordHash = generateRecordHash(record);
+    const blockchainResult = await storeRecordHash(record._id.toString(), recordHash);
+    
+    // Store hash in database for future verification
+    record.blockchainHash = recordHash;
+    record.blockchainTxHash = blockchainResult.txHash || null;
+    await record.save();
+
     // 📝 Log the record upload
     await AccessLog.create({
       patientId,
@@ -131,6 +164,30 @@ const uploadRecord = async (req, res) => {
       recordsAccessed: recordType,
       timestamp: new Date()
     });
+
+    // 📝 Save audit log for patient
+    let docId = null;
+    if (doctorObjectId) {
+      docId = doctorObjectId;
+    } else if (doctorId) {
+      const Doctor = require('../models/Doctor');
+      const doc = await Doctor.findById(doctorId);
+      if (doc) docId = doc._id;
+    }
+    
+    if (docId) {
+      await AuditLog.create({
+        patientId,
+        actor_entity: 'Patient Record System',
+        action_type: 'record_uploaded',
+        affected_resource: `medical_record_${recordType}`,
+        metadata: {
+          reason: `Medical record uploaded: ${recordType}`,
+          recordType: recordType,
+          blockchainHash: recordHash
+        }
+      });
+    }
 
     res.status(201).json({
       message: '✅ Record submitted for approval',
@@ -318,9 +375,19 @@ const approveRecord = async (req, res) => {
     const originalRecord = await MedicalRecord.findById(id);
     if (!originalRecord) return res.status(404).json({ message: 'Record not found' });
 
+    // 🔒 Check if record is frozen
+    if (originalRecord.isFrozen) {
+      return res.status(403).json({ 
+        message: 'Cannot modify frozen record',
+        reason: originalRecord.flagReason,
+        isFrozen: true
+      });
+    }
+
     const updateData = {
       status,
-      approvedBy: doctorId,
+      approvedBy: doctorName || doctorId,  // Store doctor name for display
+      doctorName: doctorName,               // Also store as doctorName field
       approvalDate: new Date(),
       updatedAt: new Date()
     };

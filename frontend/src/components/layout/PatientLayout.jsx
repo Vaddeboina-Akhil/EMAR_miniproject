@@ -11,7 +11,8 @@ const PatientLayout = ({ children, activePage, onNavigate }) => {
     { label: 'Consent Settings', path: '/patient/consent' },
     { label: 'Request Access', path: '/patient/request-access' },
     { label: 'Audit Trail', path: '/patient/audit-trail' },
-    { label: 'Prescription', path: '/patient/prescriptions' }
+    { label: 'Prescription', path: '/patient/prescriptions' },
+    { label: 'Edit Profile', path: '/patient/edit-profile' }
   ];
 
   const isActive = (label) => activePage === label;

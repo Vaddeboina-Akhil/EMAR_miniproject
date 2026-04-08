@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientLayout from '../../components/layout/PatientLayout';
-import { getUser, calculateAge } from '../../utils/auth';
+import { getUser, getRole, calculateAge } from '../../utils/auth';
 import { api } from '../../services/api';
 
 const PatientDashboard = () => {
   const navigate = useNavigate();
   const userFromStorage = getUser();
+  const userRole = getRole();
   const [userProfile, setUserProfile] = useState(userFromStorage);
   
   // 🔐 Validate that the logged-in user is actually a patient
-  if (!userFromStorage || userFromStorage.role !== 'patient') {
+  if (!userFromStorage || !userRole || userRole !== 'patient') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -116,14 +117,22 @@ const PatientDashboard = () => {
           color: 'white', marginBottom: '24px'
         }}>
           {/* ── Avatar — shows profile photo if uploaded, else initials ── */}
-          <div style={{
-            width: '80px', height: '80px', borderRadius: '50%',
-            backgroundColor: 'rgba(255,255,255,0.25)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '32px', fontWeight: 'bold',
-            overflow: 'hidden', flexShrink: 0,
-            border: '3px solid rgba(255,255,255,0.4)'
-          }}>
+          <div
+            onClick={() => navigate('/patient/edit-profile')}
+            style={{
+              width: '80px', height: '80px', borderRadius: '50%',
+              backgroundColor: 'rgba(255,255,255,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '32px', fontWeight: 'bold',
+              overflow: 'hidden', flexShrink: 0,
+              border: '3px solid rgba(255,255,255,0.4)',
+              cursor: 'pointer', transition: 'transform 0.2s',
+              position: 'relative'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            title="Click to edit profile"
+          >
             {userProfile?.profileImage ? (
               <img
                 src={userProfile.profileImage}
@@ -133,6 +142,14 @@ const PatientDashboard = () => {
             ) : (
               userProfile?.name ? userProfile.name.charAt(0).toUpperCase() : '?'
             )}
+            <div style={{
+              position: 'absolute', bottom: '0', right: '0',
+              backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '50%',
+              width: '24px', height: '24px', display: 'flex',
+              alignItems: 'center', justifyContent: 'center', fontSize: '12px'
+            }}>
+              ✎
+            </div>
           </div>
 
           {/* Info */}
@@ -151,16 +168,21 @@ const PatientDashboard = () => {
             </div>
           </div>
 
-          {/* Status Badge */}
-          <div style={{
-            marginLeft: 'auto', border: '2px solid white',
-            borderRadius: '50px', padding: '6px 16px',
-            fontWeight: 'bold', display: 'flex', alignItems: 'center',
-            gap: '6px', whiteSpace: 'nowrap'
-          }}>
-            <div style={{ width: '8px', height: '8px', backgroundColor: '#2ECC71', borderRadius: '50%' }} />
-            ACTIVE
-          </div>
+          {/* Edit Profile Button */}
+          <button
+            onClick={() => navigate('/patient/edit-profile')}
+            style={{
+              marginLeft: 'auto', border: '2px solid white',
+              borderRadius: '8px', padding: '8px 16px',
+              fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.2)',
+              color: 'white', cursor: 'pointer', fontSize: '13px',
+              transition: 'background-color 0.2s', whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)')}
+          >
+            ✎ Edit Profile
+          </button>
         </div>
 
         {/* Stats Row */}

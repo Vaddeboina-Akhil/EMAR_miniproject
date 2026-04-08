@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService, doctorService } from '../../services/apiService';
+import { getUser } from '../../utils/auth';
 
 const StaffDashboard = () => {
   const navigate = useNavigate();
+  const staff = getUser();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Log staff data for debugging
+  React.useEffect(() => {
+    console.log('👤 Staff data loaded:', staff);
+    if (staff) {
+      console.log('🏥 Hospital Name:', staff.hospitalName || 'NOT SET');
+      console.log('📋 All staff fields:', Object.keys(staff));
+    }
+  }, [staff]);
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -73,7 +84,7 @@ const StaffDashboard = () => {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#999' }}>
             <span style={{ display: 'inline-block', width: '8px', height: '8px', backgroundColor: '#FF4444', borderRadius: '50%' }}></span>
-            Emergency
+            🏥 {staff?.hospitalName || 'Hospital'}
           </div>
         </div>
 

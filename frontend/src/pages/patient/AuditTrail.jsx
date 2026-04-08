@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientLayout from '../../components/layout/PatientLayout';
-import { getUser } from '../../utils/auth';
+import { getUser, getRole } from '../../utils/auth';
 import { api } from '../../services/api';
 
 const PatientAuditTrail = () => {
   const navigate = useNavigate();
   const user = getUser();
+  const userRole = getRole();
 
   // 🔐 Validate that the logged-in user is actually a patient
-  if (!user || user.role !== 'patient') {
+  if (!user || !userRole || userRole !== 'patient') {
     return (
       <div style={{
         display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -94,12 +95,16 @@ const PatientAuditTrail = () => {
     try {
       const patientId = user?._id || user?.id;
       if (!patientId) return;
-      const data = await api.get(`/access-logs/${patientId}`);
+      
+      // Fetch from new audit logs endpoint
+      const data = await api.get(`/consent/audit-logs/${patientId}`);
       const list = Array.isArray(data) ? data : [];
       setLogs(list);
       setFiltered(list);
     } catch (err) {
       console.error('Failed to fetch audit logs:', err);
+      setLogs([]);
+      setFiltered([]);
     } finally {
       setLoading(false);
     }
@@ -111,7 +116,7 @@ const PatientAuditTrail = () => {
     if (type === 'All Types') {
       setFiltered(logs);
     } else {
-      setFiltered(logs.filter(l => l.accessType === type));
+      setFiltered(logs.filter(l => l.action_type === type));
     }
   };
 
@@ -259,19 +264,19 @@ const PatientAuditTrail = () => {
                 {/* Avatar circle */}
                 <div style={{
                   width: '44px', height: '44px', borderRadius: '50%',
-                  backgroundColor: `${typeColors[log.accessType] || '#ccc'}22`,
-                  border: `2px solid ${typeColors[log.accessType] || '#ccc'}`,
+                  backgroundColor: `${typeColors[log.action_type] || '#ccc'}22`,
+                  border: `2px solid ${typeColors[log.action_type] || '#ccc'}`,
                   flexShrink: 0, display: 'flex',
                   alignItems: 'center', justifyContent: 'center',
                   fontSize: '18px'
                 }}>
-                  {log.accessType === 'approved' ? '✅' :
-                   log.accessType === 'denied' ? '❌' :
-                   log.accessType === 'requested' ? '📋' :
-                   log.accessType === 'record_uploaded' ? '📤' :
-                   log.accessType === 'record_approved' ? '☑️' :
-                   log.accessType === 'record_rejected' ? '⛔' :
-                   log.accessType === 'emergency' ? '🚨' : '👁️'}
+                  {log.action_type === 'approved' ? '✅' :
+                   log.action_type === 'denied' ? '❌' :
+                   log.action_type === 'requested' ? '📋' :
+                   log.action_type === 'record_uploaded' ? '📤' :
+                   log.action_type === 'record_approved' ? '☑️' :
+                   log.action_type === 'record_rejected' ? '⛔' :
+                   log.action_type === 'emergency' ? '🚨' : '👁️'}
                 </div>
 
                 {/* Content */}
@@ -280,13 +285,10 @@ const PatientAuditTrail = () => {
                     fontWeight: 'bold', fontSize: '17px',
                     color: '#111', marginBottom: '2px'
                   }}>
-                    {log.doctorName || 'Unknown'}
+                    {log.actor_entity || 'Unknown'}
                   </div>
                   <div style={{ fontSize: '13px', color: '#888', marginBottom: '8px' }}>
                     {formatDateTime(log.timestamp)}
-                    {log.hospitalName && (
-                      <span style={{ marginLeft: '12px' }}>🏥 {log.hospitalName}</span>
-                    )}
                   </div>
 
                   {/* Access details box */}
@@ -295,23 +297,23 @@ const PatientAuditTrail = () => {
                     padding: '12px 16px', fontSize: '13px', color: '#444'
                   }}>
                     <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#333' }}>
-                      Access Details:
+                      Action: {log.action_type}
                     </div>
-                    {log.reason && (
+                    {log.metadata?.reason && (
                       <div style={{ marginBottom: '3px' }}>
-                        {log.reason}
+                        {log.metadata.reason}
                       </div>
                     )}
-                    {log.ipAddress && (
+                    {log.metadata?.ipAddress && (
                       <div style={{ marginBottom: '3px' }}>
                         <span style={{ color: '#666' }}>IP Address: </span>
-                        <span style={{ fontFamily: 'monospace' }}>{log.ipAddress}</span>
+                        <span style={{ fontFamily: 'monospace' }}>{log.metadata.ipAddress}</span>
                       </div>
                     )}
-                    {log.recordsAccessed && (
-                      <div>
-                        <span style={{ color: '#666' }}>Records Accessed: </span>
-                        {log.recordsAccessed}
+                    {log.affected_resource && (
+                      <div style={{ marginBottom: '3px' }}>
+                        <span style={{ color: '#666' }}>Resource: </span>
+                        {log.affected_resource}
                       </div>
                     )}
                     {/* Blockchain hash */}
@@ -326,13 +328,13 @@ const PatientAuditTrail = () => {
                   flexShrink: 0, textAlign: 'right'
                 }}>
                   <span style={{
-                    backgroundColor: `${typeColors[log.accessType] || '#ccc'}22`,
-                    color: typeColors[log.accessType] || '#666',
+                    backgroundColor: `${typeColors[log.action_type] || '#ccc'}22`,
+                    color: typeColors[log.action_type] || '#666',
                     borderRadius: '50px', padding: '4px 12px',
                     fontSize: '12px', fontWeight: 'bold',
                     textTransform: 'uppercase'
                   }}>
-                    {log.accessType || 'access'}
+                    {log.action_type || 'access'}
                   </span>
                 </div>
               </div>

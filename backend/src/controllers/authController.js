@@ -139,6 +139,8 @@ const loginStaff = async (req, res) => {
     const token = generateToken(staff._id, 'staff');
     const userObj = staff.toObject();
     delete userObj.password;
+    console.log('🔐 Staff Login Response - user object:', userObj);
+    console.log('🏥 Hospital Name being returned:', userObj.hospitalName);
     res.json({ token, user: userObj });
   } catch (err) {
     res.status(500).json({ message: err.message });

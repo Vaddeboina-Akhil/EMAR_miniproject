@@ -39,6 +39,12 @@ const medicalRecordSchema = new mongoose.Schema({
   fileName: { type: String },
   fileSize: { type: Number },
   
+  // 🔐 BLOCKCHAIN: Security layer for tamper detection
+  blockchainHash: { type: String }, // SHA256 hash of record data
+  blockchainTxHash: { type: String }, // Blockchain transaction hash
+  isTampered: { type: Boolean, default: false }, // Flag if hash mismatch detected
+  tamperedDetectedAt: { type: Date },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

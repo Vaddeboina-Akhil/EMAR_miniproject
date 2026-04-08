@@ -1,6 +1,11 @@
 export const getUser = () => JSON.parse(localStorage.getItem('emar_user') || 'null');
 export const setUser = (user) => localStorage.setItem('emar_user', JSON.stringify(user));
-export const logout = () => localStorage.removeItem('emar_user');
+export const getRole = () => localStorage.getItem('emar_role');
+export const logout = () => {
+  localStorage.removeItem('emar_user');
+  localStorage.removeItem('emar_token');
+  localStorage.removeItem('emar_role');
+};
 export const calculateAge = (dob) => {
   const today = new Date();
   const birth = new Date(dob);

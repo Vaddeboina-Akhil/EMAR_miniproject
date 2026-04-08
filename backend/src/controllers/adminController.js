@@ -3,6 +3,7 @@ const Staff = require('../models/Staff');
 const Patient = require('../models/Patient');
 const MedicalRecord = require('../models/MedicalRecord');
 const AccessLog = require('../models/AccessLog');
+const SystemStatus = require('../models/SystemStatus');
 const bcrypt = require('bcryptjs');
 
 // ============= DOCTOR MANAGEMENT =============
@@ -171,7 +172,11 @@ const listRecords = async (req, res) => {
   try {
     const { status } = req.query;
     const query = status ? { status } : {};
-    const records = await MedicalRecord.find(query).sort({ createdAt: -1 });
+    
+    const records = await MedicalRecord.find(query)
+      .populate('doctorObjectId', 'name email specialization hospitalName')
+      .sort({ createdAt: -1 });
+    
     const stats = {
       total: records.length,
       draft: records.filter(r => r.status === 'draft').length,
@@ -181,7 +186,36 @@ const listRecords = async (req, res) => {
       frozen: records.filter(r => r.isFrozen).length,
       flagged: records.filter(r => r.isFlagged).length
     };
-    res.json({ records, stats });
+    
+    // Format response with full details
+    const formattedRecords = records.map(r => ({
+      _id: r._id,
+      id: r._id,
+      patientName: r.patientName,
+      patientId: r.patientId,
+      recordType: r.recordType,
+      // Try multiple sources for hospital name
+      hospital: r.hospitalName || r.doctorObjectId?.hospitalName || '—',
+      uploadedBy: r.staffName || '—',
+      uploadedByStaffId: r.staffId || '—',
+      // Try multiple sources for approved by: doctorObjectId.name → doctorName → approvedBy → 'Pending'
+      approvedBy: r.doctorObjectId?.name || r.doctorName || r.approvedBy || 'Pending',
+      approvedByEmail: r.doctorObjectId?.email || '',
+      status: r.status,
+      isFrozen: r.isFrozen,
+      isFlagged: r.isFlagged,
+      flagReason: r.flagReason,
+      diagnosis: r.diagnosis,
+      fileUrl: r.fileUrl,
+      fileName: r.fileName,
+      fileSize: r.fileSize,
+      blockchainHash: r.blockchainHash,
+      isTampered: r.isTampered,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt
+    }));
+    
+    res.json({ records: formattedRecords, stats });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -336,6 +370,87 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+// ============= SYSTEM FREEZE/UNFREEZE (BLOCKCHAIN SECURITY) =============
+
+/**
+ * Get current system status
+ */
+const getSystemStatus = async (req, res) => {
+  try {
+    const status = await SystemStatus.getInstance();
+    res.json({
+      isFrozen: status.isFrozen,
+      reason: status.reason,
+      frozenAt: status.frozenAt,
+      updatedAt: status.updatedAt
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/**
+ * Freeze system - blocks all write operations
+ * Used when tampering or suspicious activity detected
+ */
+const freezeSystem = async (req, res) => {
+  try {
+    const { reason = 'Manual admin freeze' } = req.body;
+    const adminId = req.user?.id || 'unknown';
+
+    const status = await SystemStatus.updateOne(
+      {},
+      {
+        isFrozen: true,
+        reason: `[${new Date().toISOString()}] ${reason} (by admin: ${adminId})`,
+        frozenAt: new Date(),
+        updatedAt: new Date()
+      },
+      { upsert: true }
+    );
+
+    console.log(`🛑 SYSTEM FROZEN: ${reason} by admin ${adminId}`);
+
+    res.json({
+      message: '✅ System frozen successfully',
+      reason
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/**
+ * Unfreeze system - resumes normal operations
+ * Only admin can unfreeze
+ */
+const unfreezeSystem = async (req, res) => {
+  try {
+    const { reason = 'Manual admin unfreeze' } = req.body;
+    const adminId = req.user?.id || 'unknown';
+
+    const status = await SystemStatus.updateOne(
+      {},
+      {
+        isFrozen: false,
+        reason: ``,
+        frozenAt: null,
+        updatedAt: new Date()
+      },
+      { upsert: true }
+    );
+
+    console.log(`✅ SYSTEM UNFROZEN by admin ${adminId}: ${reason}`);
+
+    res.json({
+      message: '✅ System unfrozen successfully',
+      reason
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   // Doctor Management
   listDoctors,
@@ -358,6 +473,10 @@ module.exports = {
   // Security
   detectSuspiciousActivity,
   getSuspiciousRecords,
+  // System Freeze/Unfreeze
+  getSystemStatus,
+  freezeSystem,
+  unfreezeSystem,
   // Dashboard
   getDashboardStats
 };
