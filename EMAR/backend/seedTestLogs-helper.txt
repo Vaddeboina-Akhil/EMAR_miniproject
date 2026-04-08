@@ -1,0 +1,55 @@
+// TEMP ADMIN ENDPOINT FOR TESTING - Add to consentController.js
+const seedTestLogs = async (req, res) => {
+  try {
+    const { patientId } = req.body;
+    if (!patientId) {
+      return res.status(400).json({ message: 'patientId required' });
+    }
+
+    const testLogs = [
+      {
+        patientId,
+        doctorName: 'Dr. AVK. ABHIRAMA PRANEETH',
+        hospitalName: 'Rainbow Hospital',
+        accessType: 'requested',
+        reason: 'Patient medical check',
+        recordsAccessed: 'General Checkup',
+        timestamp: new Date(Date.now() - 5*24*60*60*1000)
+      },
+      {
+        patientId,
+        doctorName: 'Dr. AVK. ABHIRAMA PRANEETH',
+        hospitalName: 'Rainbow Hospital',
+        accessType: 'approved',
+        reason: 'Access granted for patient medical check',
+        recordsAccessed: 'General Checkup',
+        timestamp: new Date(Date.now() - 4*24*60*60*1000)
+      },
+      {
+        patientId,
+        doctorName: 'Staff',
+        hospitalName: 'Apollo Hospitals Chennai',
+        accessType: 'record_uploaded',
+        reason: 'Blood Test uploaded - Routine Checkup',
+        recordsAccessed: 'Blood Test',
+        timestamp: new Date(Date.now() - 3*24*60*60*1000)
+      },
+      {
+        patientId,
+        doctorName: 'Dr. JOHN SMITH',
+        hospitalName: 'Apollo Hospitals Chennai',
+        accessType: 'record_approved',
+        reason: 'Blood Test approved by Dr. JOHN SMITH',
+        recordsAccessed: 'Blood Test',
+        timestamp: new Date(Date.now() - 2*24*60*60*1000)
+      }
+    ];
+
+    await AccessLog.insertMany(testLogs);
+    res.json({ message: `✅ Created ${testLogs.length} test logs` });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = seedTestLogs;
