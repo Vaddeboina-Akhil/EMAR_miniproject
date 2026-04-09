@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setUser } from '../../utils/auth';
 import { api } from '../../services/api';
-import './Login.css';
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState('patient');
