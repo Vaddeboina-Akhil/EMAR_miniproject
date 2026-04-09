@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setUser } from '../../utils/auth';
 import { api } from '../../services/api';
@@ -10,7 +10,17 @@ const Login = () => {
   const [slideDir, setSlideDir] = useState('left');
   const [formData, setFormData] = useState({ id: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const roleColors = {
     patient: '#1E4D35',
@@ -150,7 +160,10 @@ const Login = () => {
 
   return (
     <div style={{
-      height: '100vh', display: 'flex', overflow: 'hidden',
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: isMobile ? 'column' : 'row',
+      overflow: isMobile ? 'auto' : 'hidden',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <style>{`
@@ -172,10 +185,37 @@ const Login = () => {
         }
       `}</style>
 
-      {/* LEFT HALF */}
+      {/* Mobile Header - Logo & Illustration as background */}
+      {isMobile && (
+        <div style={{
+          backgroundColor: '#F0F4F8',
+          padding: '20px',
+          textAlign: 'center',
+          borderBottom: '2px solid #E0E0E0',
+          backgroundImage: `url(${displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'})`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center bottom',
+          minHeight: '140px',
+          position: 'relative'
+        }}>
+          <div style={{ marginBottom: '0px', ...getAnimStyle(), position: 'relative', zIndex: 10 }}>
+            <img
+              src={displayRole === 'patient' ? '/images/logo-green.png' : '/images/logo-blue.png'}
+              alt="EMAR"
+              style={{ height: '20px', objectFit: 'contain' }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* LEFT HALF - Desktop only */}
       <div style={{
-        flex: '0 0 45%', backgroundColor: '#F0F4F8',
-        position: 'relative', overflow: 'hidden'
+        display: isMobile ? 'none' : 'flex',
+        flex: '0 0 45%', 
+        backgroundColor: '#F0F4F8',
+        position: 'relative', 
+        overflow: 'hidden'
       }}>
         <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10, ...getAnimStyle() }}>
           <img
@@ -205,24 +245,36 @@ const Login = () => {
         </div>
       </div>
 
-      {/* RIGHT HALF */}
+      {/* RIGHT HALF - Full width on mobile */}
       <div style={{
-        flex: 1,
+        flex: isMobile ? 1 : 1,
         backgroundColor: roleColors[selectedRole],
-        padding: '60px',
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        transition: animState === 'idle' ? 'background-color 0.4s ease' : 'none'
+        padding: isMobile ? '20px' : '60px',
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: isMobile ? 'flex-start' : 'center',
+        paddingTop: isMobile ? '40px' : '60px',
+        transition: animState === 'idle' ? 'background-color 0.4s ease' : 'none',
+        overflow: isMobile ? 'visible' : 'auto',
+        minHeight: isMobile ? 'auto' : '100vh'
       }}>
         <h1 style={{
-          fontSize: '52px', fontWeight: '900',
-          color: 'white', marginBottom: '32px', lineHeight: '1.1'
+          fontSize: isMobile ? '32px' : '52px', 
+          fontWeight: '900',
+          color: 'white', 
+          marginBottom: isMobile ? '20px' : '32px', 
+          lineHeight: '1.1'
         }}>
           Login as
         </h1>
 
         <div style={{
-          backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: '50px',
-          padding: '4px', display: 'flex', marginBottom: '32px', width: 'fit-content'
+          backgroundColor: 'rgba(255,255,255,0.15)', 
+          borderRadius: '50px',
+          padding: '4px', 
+          display: 'flex', 
+          marginBottom: isMobile ? '20px' : '32px', 
+          width: 'fit-content'
         }}>
           {roleTabs.map((tab) => (
             <div
@@ -231,11 +283,16 @@ const Login = () => {
               style={{
                 backgroundColor: selectedRole === tab.key ? 'white' : 'transparent',
                 color: selectedRole === tab.key ? roleColors[tab.key] : 'white',
-                padding: '10px 24px', borderRadius: '50px',
+                padding: isMobile ? '8px 16px' : '10px 24px', 
+                borderRadius: '50px',
                 fontWeight: selectedRole === tab.key ? 'bold' : 'normal',
-                fontSize: '16px', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: '8px',
-                transition: 'all 0.25s ease', whiteSpace: 'nowrap'
+                fontSize: isMobile ? '14px' : '16px', 
+                cursor: 'pointer',
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px',
+                transition: 'all 0.25s ease', 
+                whiteSpace: 'nowrap'
               }}
             >
               {tab.icon} {tab.label}
@@ -246,8 +303,11 @@ const Login = () => {
         <div>
           <div style={{ marginBottom: '16px' }}>
             <label style={{
-              fontWeight: 'bold', color: 'white',
-              fontSize: '16px', display: 'block', marginBottom: '8px'
+              fontWeight: 'bold', 
+              color: 'white',
+              fontSize: isMobile ? '14px' : '16px', 
+              display: 'block', 
+              marginBottom: '8px'
             }}>
               {config.label1}
             </label>
@@ -259,18 +319,26 @@ const Login = () => {
               value={formData.id}
               onChange={(e) => setFormData({ ...formData, id: e.target.value })}
               style={{
-                width: '100%', padding: '14px 22px', borderRadius: '50px',
+                width: '100%', 
+                padding: isMobile ? '12px 18px' : '14px 22px', 
+                borderRadius: '50px',
                 backgroundColor: 'rgba(255,255,255,0.15)',
-                border: 'none', color: 'white', fontSize: '16px',
-                outline: 'none', boxSizing: 'border-box'
+                border: 'none', 
+                color: 'white', 
+                fontSize: isMobile ? '14px' : '16px',
+                outline: 'none', 
+                boxSizing: 'border-box'
               }}
             />
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
             <label style={{
-              fontWeight: 'bold', color: 'white',
-              fontSize: '16px', display: 'block', marginBottom: '8px'
+              fontWeight: 'bold', 
+              color: 'white',
+              fontSize: isMobile ? '14px' : '16px', 
+              display: 'block', 
+              marginBottom: '8px'
             }}>
               {config.label2}
             </label>
@@ -282,10 +350,15 @@ const Login = () => {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               style={{
-                width: '100%', padding: '14px 22px', borderRadius: '50px',
+                width: '100%', 
+                padding: isMobile ? '12px 18px' : '14px 22px', 
+                borderRadius: '50px',
                 backgroundColor: 'rgba(255,255,255,0.15)',
-                border: 'none', color: 'white', fontSize: '16px',
-                outline: 'none', boxSizing: 'border-box'
+                border: 'none', 
+                color: 'white', 
+                fontSize: isMobile ? '14px' : '16px',
+                outline: 'none', 
+                boxSizing: 'border-box'
               }}
             />
           </div>
@@ -295,11 +368,11 @@ const Login = () => {
             onClick={handleSubmit}
             style={{
               width: '100%',
-              height: '56px',
+              height: isMobile ? '50px' : '56px',
               borderRadius: '50px',
               backgroundColor: isLoading ? '#ccc' : buttonColors[selectedRole],
               color: isLoading ? '#666' : 'white',
-              fontSize: '20px',
+              fontSize: isMobile ? '16px' : '20px',
               fontWeight: 'bold',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               userSelect: 'none',
@@ -315,7 +388,13 @@ const Login = () => {
           </div>
         </div>
 
-        <p style={{ color: 'white', textAlign: 'center', marginTop: '20px', fontSize: '14px' }}>
+        <p style={{ 
+          color: 'white', 
+          textAlign: 'center', 
+          marginTop: isMobile ? '16px' : '20px', 
+          marginBottom: isMobile ? '30px' : '20px',
+          fontSize: isMobile ? '12px' : '14px' 
+        }}>
           Don't have an account?{' '}
           <span
             onClick={() => navigate('/signup')}

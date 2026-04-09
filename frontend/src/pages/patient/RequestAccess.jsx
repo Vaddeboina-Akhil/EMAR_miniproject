@@ -55,7 +55,8 @@ const PatientRequestAccess = () => {
       'Consent Settings': '/patient/consent',
       'Request Access': '/patient/request-access',
       'Audit Trail': '/patient/audit-trail',
-      'Prescription': '/patient/prescriptions'
+      'Prescription': '/patient/prescriptions',
+      'Edit Profile': '/patient/edit-profile'
     };
     navigate(routes[page]);
   };

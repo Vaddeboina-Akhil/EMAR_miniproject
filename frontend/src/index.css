@@ -188,3 +188,76 @@ button::-moz-selection { /* Firefox */
   background-clip: text;
 }
 
+/* ═══════════════════════════════════════════════════════════════════ */
+/* RESPONSIVE DESIGN - MOBILE FIRST APPROACH                          */
+/* ═══════════════════════════════════════════════════════════════════ */
+
+/* Touch-friendly targets - ensure min 44x44px */
+button, a, input[type="button"], input[type="submit"], 
+input[type="checkbox"], input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Responsive Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table td, table th {
+  padding: 8px;
+  text-align: left;
+}
+
+/* Tablet & larger (768px and up) */
+@media (min-width: 768px) {
+  table td, table th {
+    padding: 12px;
+  }
+}
+
+/* Mobile: Hide scrollbar style on small screens for cleaner look */
+@media (max-width: 480px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+}
+
+/* Responsive text scaling */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+  
+  h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 18px; }
+  h4 { font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 20px; }
+  h2 { font-size: 18px; }
+  h3 { font-size: 16px; }
+  h4 { font-size: 14px; }
+}
+
+/* Responsive spacing utilities */
+@media (max-width: 768px) {
+  .padding-responsive {
+    padding: 16px !important;
+  }
+  
+  .margin-responsive {
+    margin: 16px !important;
+  }
+}
+

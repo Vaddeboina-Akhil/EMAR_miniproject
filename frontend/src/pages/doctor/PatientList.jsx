@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DoctorLayout from '../../components/layout/DoctorLayout';
 import { api } from '../../services/api';
@@ -9,6 +9,16 @@ const SearchPatient = () => {
   const [results, setResults] = useState([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Detect window resize for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -31,35 +41,43 @@ const SearchPatient = () => {
     <DoctorLayout activePage="Search Patient">
       <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
 
-        {/* Header */}
+        {/* Header - Responsive padding & font size */}
         <div style={{
           backgroundColor: '#1A237E', borderRadius: '16px',
-          padding: '28px', color: 'white', marginBottom: '24px'
+          padding: isMobile ? '20px 16px' : '28px', 
+          color: 'white', marginBottom: '24px'
         }}>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px' }}>
+          <div style={{ fontSize: isMobile ? '20px' : '28px', fontWeight: 'bold', marginBottom: '8px' }}>
             🔍 Search Patient
           </div>
-          <div style={{ fontSize: '14px', opacity: 0.85 }}>
+          <div style={{ fontSize: isMobile ? '12px' : '14px', opacity: 0.85 }}>
             Find patients by EMAR ID, name, or Aadhaar ID
           </div>
         </div>
 
-        {/* Search Box */}
+        {/* Search Box - Responsive layout */}
         <div style={{
           backgroundColor: 'white', borderRadius: '16px',
-          padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          padding: isMobile ? '16px' : '24px', 
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
           marginBottom: '24px'
         }}>
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: '12px' }}>
+          <form onSubmit={handleSearch} style={{ 
+            display: 'flex', 
+            gap: '12px',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'stretch' : 'center'
+          }}>
             <input
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Enter EMAR ID (e.g. EMAR-P-1023), Patient Name, or Aadhaar ID..."
+              placeholder={isMobile ? "Enter EMAR ID or name..." : "Enter EMAR ID (e.g. EMAR-P-1023), Patient Name, or Aadhaar ID..."}
               style={{
                 flex: 1, padding: '14px 22px', borderRadius: '50px',
                 border: '1.5px solid #ddd', fontSize: '15px',
-                outline: 'none', boxSizing: 'border-box'
+                outline: 'none', boxSizing: 'border-box',
+                minHeight: '44px'
               }}
               onFocus={e => e.target.style.borderColor = '#1A237E'}
               onBlur={e => e.target.style.borderColor = '#ddd'}
@@ -67,15 +85,19 @@ const SearchPatient = () => {
             <button type="submit" style={{
               backgroundColor: '#1A237E', color: 'white',
               border: 'none', borderRadius: '50px',
-              padding: '14px 32px', fontSize: '15px',
-              fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap'
+              padding: isMobile ? '12px 16px' : '14px 32px', 
+              fontSize: isMobile ? '14px' : '15px',
+              fontWeight: 'bold', cursor: 'pointer', 
+              whiteSpace: 'nowrap',
+              minHeight: '44px',
+              width: isMobile ? '100%' : 'auto'
             }}>
               {loading ? 'Searching...' : '🔍 Search'}
             </button>
           </form>
 
-          <div style={{ marginTop: '12px', fontSize: '13px', color: '#999' }}>
-            Tip: Search by full EMAR ID like "EMAR-P-1023" for exact match
+          <div style={{ marginTop: '12px', fontSize: '12px', color: '#999' }}>
+            Tip: Search by EMAR ID for best results
           </div>
         </div>
 
@@ -88,15 +110,15 @@ const SearchPatient = () => {
 
             {results.length === 0 && (
               <div style={{
-                textAlign: 'center', padding: '60px 20px',
+                textAlign: 'center', padding: isMobile ? '40px 16px' : '60px 20px',
                 backgroundColor: 'white', borderRadius: '16px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
               }}>
-                <div style={{ fontSize: '48px', marginBottom: '12px' }}>🔍</div>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
+                <div style={{ fontSize: isMobile ? '36px' : '48px', marginBottom: '12px' }}>🔍</div>
+                <div style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 'bold', color: '#333' }}>
                   No patients found
                 </div>
-                <div style={{ fontSize: '14px', color: '#999', marginTop: '4px' }}>
+                <div style={{ fontSize: isMobile ? '12px' : '14px', color: '#999', marginTop: '4px' }}>
                   Try searching with a different EMAR ID or name
                 </div>
               </div>
@@ -106,8 +128,12 @@ const SearchPatient = () => {
               {results.map((patient, i) => (
                 <div key={patient._id || i} style={{
                   backgroundColor: 'white', borderRadius: '16px',
-                  padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  display: 'flex', alignItems: 'center', gap: '16px'
+                  padding: isMobile ? '12px' : '20px', 
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  display: 'flex', 
+                  flexDirection: isMobile ? 'column' : 'row',
+                  alignItems: isMobile ? 'flex-start' : 'center',
+                  gap: isMobile ? '12px' : '16px'
                 }}>
                   {/* Avatar */}
                   <div style={{
@@ -115,37 +141,41 @@ const SearchPatient = () => {
                     backgroundColor: '#E8EAF6', flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '22px', fontWeight: 'bold', color: '#1A237E',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    minWidth: '56px', minHeight: '56px'
                   }}>
                     {patient.profileImage
                       ? <img src={patient.profileImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : (patient.name?.charAt(0).toUpperCase() || '?')}
                   </div>
 
-                  {/* Info */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 'bold', fontSize: '17px', color: '#111', marginBottom: '4px' }}>
+                  {/* Info - Responsive text sizes */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 'bold', fontSize: isMobile ? '14px' : '17px', color: '#111', marginBottom: '4px', wordBreak: 'break-word' }}>
                       {patient.name}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#666', marginBottom: '2px' }}>
-                      EMAR ID: {patient.patientId || '—'} · Age: {patient.age || '—'} · Blood: {patient.bloodGroup || '—'}
+                    <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#666', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: isMobile ? 'pre-wrap' : 'nowrap' }}>
+                      EMAR ID: {patient.patientId || '—'} · Age: {patient.age || '—'}
                     </div>
-                    <div style={{ fontSize: '13px', color: '#999' }}>
+                    <div style={{ fontSize: isMobile ? '11px' : '13px', color: '#999' }}>
                       Aadhaar: {patient.aadhaarId?.replace(/(\d{4})(\d{4})(\d{4})/, '$1-$2-$3') || '—'}
                     </div>
                   </div>
 
-                  {/* Action */}
+                  {/* Action Button - Full width on mobile */}
                   <button
                     onClick={() => navigate(`/doctor/patient/${patient._id}`)}
                     style={{
                       backgroundColor: '#1A237E', color: 'white',
                       border: 'none', borderRadius: '50px',
-                      padding: '10px 24px', fontSize: '14px',
-                      fontWeight: 'bold', cursor: 'pointer'
+                      padding: isMobile ? '10px 16px' : '10px 24px', 
+                      fontSize: isMobile ? '12px' : '14px',
+                      fontWeight: 'bold', cursor: 'pointer',
+                      width: isMobile ? '100%' : 'auto',
+                      minHeight: '44px'
                     }}
                   >
-                    View Patient →
+                    {isMobile ? 'View' : 'View Patient'} →
                   </button>
                 </div>
               ))}
@@ -156,15 +186,15 @@ const SearchPatient = () => {
         {/* Before search — hint */}
         {!searched && !loading && (
           <div style={{
-            textAlign: 'center', padding: '60px 20px',
+            textAlign: 'center', padding: isMobile ? '40px 16px' : '60px 20px',
             backgroundColor: 'white', borderRadius: '16px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '12px' }}>🏥</div>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#333' }}>
+            <div style={{ fontSize: isMobile ? '36px' : '48px', marginBottom: '12px' }}>🏥</div>
+            <div style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: 'bold', color: '#333' }}>
               Search for a patient to get started
             </div>
-            <div style={{ fontSize: '14px', color: '#999', marginTop: '4px' }}>
+            <div style={{ fontSize: isMobile ? '12px' : '14px', color: '#999', marginTop: '4px' }}>
               Enter EMAR ID, patient name, or Aadhaar ID above
             </div>
           </div>

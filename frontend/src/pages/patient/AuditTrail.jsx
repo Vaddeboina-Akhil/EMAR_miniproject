@@ -8,6 +8,16 @@ const PatientAuditTrail = () => {
   const navigate = useNavigate();
   const user = getUser();
   const userRole = getRole();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 🔐 Validate that the logged-in user is actually a patient
   if (!user || !userRole || userRole !== 'patient') {
@@ -82,7 +92,8 @@ const PatientAuditTrail = () => {
       'Consent Settings': '/patient/consent',
       'Request Access': '/patient/request-access',
       'Audit Trail': '/patient/audit-trail',
-      'Prescription': '/patient/prescriptions'
+      'Prescription': '/patient/prescriptions',
+      'Edit Profile': '/patient/edit-profile'
     };
     navigate(routes[page]);
   };
@@ -214,13 +225,18 @@ const PatientAuditTrail = () => {
 
           {/* Total badge */}
           <div style={{
-            position: 'absolute', top: '24px', right: '24px',
+            position: 'absolute', 
+            top: isMobile ? '16px' : '24px', 
+            right: isMobile ? '16px' : '24px',
             backgroundColor: 'rgba(255,255,255,0.2)',
-            borderRadius: '12px', padding: '12px 20px', textAlign: 'center'
+            borderRadius: '12px', 
+            padding: isMobile ? '8px 16px' : '12px 20px', 
+            textAlign: 'center'
           }}>
-            <div style={{ fontSize: '32px', fontWeight: '900' }}>{logs.length}</div>
-            <div style={{ fontSize: '11px', opacity: 0.85 }}>Total Logs</div>
+            <div style={{ fontSize: isMobile ? '20px' : '32px', fontWeight: '900' }}>{logs.length}</div>
+            <div style={{ fontSize: isMobile ? '9px' : '11px', opacity: 0.85 }}>Total Logs</div>
           </div>
+        </div>
         </div>
 
         {/* Timeline Title */}
@@ -366,8 +382,6 @@ const PatientAuditTrail = () => {
             </div>
           </div>
         </div>
-
-      </div>
     </PatientLayout>
   );
 };
