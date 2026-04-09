@@ -185,26 +185,25 @@ const Login = () => {
         }
       `}</style>
 
-      {/* Mobile Header - Logo & Illustration at top */}
+      {/* Mobile Header - Logo & Illustration as background */}
       {isMobile && (
         <div style={{
           backgroundColor: '#F0F4F8',
           padding: '20px',
           textAlign: 'center',
-          borderBottom: '2px solid #E0E0E0'
+          borderBottom: '2px solid #E0E0E0',
+          backgroundImage: `url(${displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'})`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center bottom',
+          minHeight: '140px',
+          position: 'relative'
         }}>
-          <div style={{ marginBottom: '16px', ...getAnimStyle() }}>
+          <div style={{ marginBottom: '0px', ...getAnimStyle(), position: 'relative', zIndex: 10 }}>
             <img
               src={displayRole === 'patient' ? '/images/logo-green.png' : '/images/logo-blue.png'}
               alt="EMAR"
               style={{ height: '20px', objectFit: 'contain' }}
-            />
-          </div>
-          <div style={{ width: '140px', margin: '0 auto', ...getAnimStyle() }}>
-            <img
-              src={displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'}
-              alt="illustration"
-              style={{ width: '100%', objectFit: 'contain', maxHeight: '120px' }}
             />
           </div>
         </div>
