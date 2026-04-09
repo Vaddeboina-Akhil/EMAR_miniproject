@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setUser } from '../../utils/auth';
 import { api } from '../../services/api';
+import './Login.css';
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState('patient');
@@ -10,17 +11,7 @@ const Login = () => {
   const [slideDir, setSlideDir] = useState('left');
   const [formData, setFormData] = useState({ id: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const navigate = useNavigate();
-
-  // Detect mobile screen size
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const roleColors = {
     patient: '#1E4D35',
@@ -148,261 +139,129 @@ const Login = () => {
     { key: 'doctor', icon: '🏥', label: 'Doctor' },
   ];
 
-  const getAnimStyle = () => {
+  const getAnimClass = () => {
     if (animState === 'exit') {
-      return { animation: `slideOut${slideDir === 'left' ? 'Left' : 'Right'} 0.3s ease forwards` };
+      return slideDir === 'left' ? 'login-anim-slide-out-left' : 'login-anim-slide-out-right';
     }
     if (animState === 'enter') {
-      return { animation: `slideIn${slideDir === 'left' ? 'Right' : 'Left'} 0.35s ease forwards` };
+      return slideDir === 'left' ? 'login-anim-slide-in-left' : 'login-anim-slide-in-right';
     }
-    return {};
+    return '';
   };
 
   return (
-    <div style={{
-      height: '100vh', 
-      display: 'flex', 
-      flexDirection: isMobile ? 'column' : 'row',
-      overflow: isMobile ? 'auto' : 'hidden',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    }}>
-      <style>{`
-        @keyframes slideOutLeft {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(-70px); }
-        }
-        @keyframes slideOutRight {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(70px); }
-        }
-        @keyframes slideInRight {
-          from { opacity: 0; transform: translateX(70px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideInLeft {
-          from { opacity: 0; transform: translateX(-70px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-      `}</style>
-
+    <div className="login-container" style={{ backgroundColor: roleColors[selectedRole] }}>
       {/* Mobile Header - Logo & Illustration as background */}
-      {isMobile && (
-        <div style={{
-          backgroundColor: '#F0F4F8',
-          padding: '20px',
-          textAlign: 'center',
-          borderBottom: '2px solid #E0E0E0',
-          backgroundImage: `url(${displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'})`,
+      <div
+        className="login-mobile-header"
+        style={{
+          backgroundImage: `url(${
+            displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'
+          })`,
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center bottom',
-          minHeight: '140px',
-          position: 'relative'
-        }}>
-          <div style={{ marginBottom: '0px', ...getAnimStyle(), position: 'relative', zIndex: 10 }}>
-            <img
-              src={displayRole === 'patient' ? '/images/logo-green.png' : '/images/logo-blue.png'}
-              alt="EMAR"
-              style={{ height: '20px', objectFit: 'contain' }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* LEFT HALF - Desktop only */}
-      <div style={{
-        display: isMobile ? 'none' : 'flex',
-        flex: '0 0 45%', 
-        backgroundColor: '#F0F4F8',
-        position: 'relative', 
-        overflow: 'hidden'
-      }}>
-        <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10, ...getAnimStyle() }}>
+        }}
+      >
+        <div className={getAnimClass()}>
           <img
             src={displayRole === 'patient' ? '/images/logo-green.png' : '/images/logo-blue.png'}
             alt="EMAR"
-            style={{ height: '25px', objectFit: 'contain' }}
+          />
+        </div>
+      </div>
+
+      {/* LEFT HALF - Desktop only */}
+      <div className="login-left-half">
+        <div className={`login-logo-left ${getAnimClass()}`}>
+          <img
+            src={displayRole === 'patient' ? '/images/logo-green.png' : '/images/logo-blue.png'}
+            alt="EMAR"
           />
         </div>
 
-        <svg viewBox="0 0 500 700" preserveAspectRatio="none" style={{
-          position: 'absolute', top: 0, left: 0,
-          width: '100%', height: '100%', zIndex: 1
-        }}>
+        <svg viewBox="0 0 500 700" preserveAspectRatio="none">
           <path d="M0,0 L320,0 Q480,100 490,350 Q480,600 320,700 L0,700 Z" fill="white" />
         </svg>
 
-        <div style={{
-          position: 'absolute', zIndex: 2,
-          bottom: '150px', left: '120px', width: '320px',
-          ...getAnimStyle()
-        }}>
+        <div className={`login-illustration-left ${getAnimClass()}`}>
           <img
-            src={displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'}
+            src={
+              displayRole === 'patient' ? '/images/patient-illustration.png' : '/images/doctor-illustration.png'
+            }
             alt="illustration"
-            style={{ width: '100%', objectFit: 'contain' }}
           />
         </div>
       </div>
 
       {/* RIGHT HALF - Full width on mobile */}
-      <div style={{
-        flex: isMobile ? 1 : 1,
-        backgroundColor: roleColors[selectedRole],
-        padding: isMobile ? '20px' : '60px',
-        display: 'flex', 
-        flexDirection: 'column', 
-        justifyContent: isMobile ? 'flex-start' : 'center',
-        paddingTop: isMobile ? '40px' : '60px',
-        transition: animState === 'idle' ? 'background-color 0.4s ease' : 'none',
-        overflow: isMobile ? 'visible' : 'auto',
-        minHeight: isMobile ? 'auto' : '100vh'
-      }}>
-        <h1 style={{
-          fontSize: isMobile ? '32px' : '52px', 
-          fontWeight: '900',
-          color: 'white', 
-          marginBottom: isMobile ? '20px' : '32px', 
-          lineHeight: '1.1'
-        }}>
-          Login as
-        </h1>
+      <div className="login-right-half">
+        <div className="login-form-container">
+          <h1 className={`login-title ${getAnimClass()}`}>Login as</h1>
 
-        <div style={{
-          backgroundColor: 'rgba(255,255,255,0.15)', 
-          borderRadius: '50px',
-          padding: '4px', 
-          display: 'flex', 
-          marginBottom: isMobile ? '20px' : '32px', 
-          width: 'fit-content'
-        }}>
-          {roleTabs.map((tab) => (
-            <div
-              key={tab.key}
-              onClick={() => handleRoleChange(tab.key)}
+          <div className="login-role-tabs">
+            {roleTabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => handleRoleChange(tab.key)}
+                className={`login-role-tab ${selectedRole === tab.key ? 'active' : ''}`}
+                style={{
+                  color: selectedRole === tab.key ? roleColors[tab.key] : 'white',
+                }}
+                aria-pressed={selectedRole === tab.key}
+              >
+                {tab.icon} {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div>
+            <div className="login-form-group">
+              <label className="login-form-label">{config.label1}</label>
+              <input
+                type="text"
+                name="username"
+                autoComplete="username"
+                placeholder={config.placeholder1}
+                value={formData.id}
+                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                className="login-form-input"
+              />
+            </div>
+
+            <div className="login-form-group">
+              <label className="login-form-label">{config.label2}</label>
+              <input
+                type="password"
+                name="password"
+                autoComplete="current-password"
+                placeholder="Enter Password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="login-form-input"
+              />
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="login-button"
               style={{
-                backgroundColor: selectedRole === tab.key ? 'white' : 'transparent',
-                color: selectedRole === tab.key ? roleColors[tab.key] : 'white',
-                padding: isMobile ? '8px 16px' : '10px 24px', 
-                borderRadius: '50px',
-                fontWeight: selectedRole === tab.key ? 'bold' : 'normal',
-                fontSize: isMobile ? '14px' : '16px', 
-                cursor: 'pointer',
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '8px',
-                transition: 'all 0.25s ease', 
-                whiteSpace: 'nowrap'
+                backgroundColor: isLoading ? '#ccc' : buttonColors[selectedRole],
+                color: isLoading ? '#666' : 'white',
               }}
             >
-              {tab.icon} {tab.label}
-            </div>
-          ))}
+              {isLoading ? '⏳ Logging in...' : 'Login Securely'}
+            </button>
+          </div>
+
+          <p className="login-signup-link">
+            Don't have an account?{' '}
+            <span onClick={() => navigate('/signup')}>
+              Sign up here
+            </span>
+          </p>
         </div>
-
-        <div>
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              fontWeight: 'bold', 
-              color: 'white',
-              fontSize: isMobile ? '14px' : '16px', 
-              display: 'block', 
-              marginBottom: '8px'
-            }}>
-              {config.label1}
-            </label>
-            <input
-              type="text"
-              name="username"
-              autoComplete="username"
-              placeholder={config.placeholder1}
-              value={formData.id}
-              onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-              style={{
-                width: '100%', 
-                padding: isMobile ? '12px 18px' : '14px 22px', 
-                borderRadius: '50px',
-                backgroundColor: 'rgba(255,255,255,0.15)',
-                border: 'none', 
-                color: 'white', 
-                fontSize: isMobile ? '14px' : '16px',
-                outline: 'none', 
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
-
-          <div style={{ marginBottom: isMobile ? '20px' : '24px' }}>
-            <label style={{
-              fontWeight: 'bold', 
-              color: 'white',
-              fontSize: isMobile ? '14px' : '16px', 
-              display: 'block', 
-              marginBottom: '8px'
-            }}>
-              {config.label2}
-            </label>
-            <input
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              placeholder="Enter Password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              style={{
-                width: '100%', 
-                padding: isMobile ? '12px 18px' : '14px 22px', 
-                borderRadius: '50px',
-                backgroundColor: 'rgba(255,255,255,0.15)',
-                border: 'none', 
-                color: 'white', 
-                fontSize: isMobile ? '14px' : '16px',
-                outline: 'none', 
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
-
-          <div
-            role="button"
-            onClick={handleSubmit}
-            style={{
-              width: '100%',
-              height: isMobile ? '50px' : '56px',
-              borderRadius: '50px',
-              backgroundColor: isLoading ? '#ccc' : buttonColors[selectedRole],
-              color: isLoading ? '#666' : 'white',
-              fontSize: isMobile ? '16px' : '20px',
-              fontWeight: 'bold',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              userSelect: 'none',
-              WebkitTapHighlightColor: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'background-color 0.4s ease',
-              opacity: isLoading ? 0.6 : 1,
-            }}
-          >
-            {isLoading ? '⏳ Logging in...' : 'Login Securely'}
-          </div>
-        </div>
-
-        <p style={{ 
-          color: 'white', 
-          textAlign: 'center', 
-          marginTop: isMobile ? '16px' : '20px', 
-          marginBottom: isMobile ? '30px' : '20px',
-          fontSize: isMobile ? '12px' : '14px' 
-        }}>
-          Don't have an account?{' '}
-          <span
-            onClick={() => navigate('/signup')}
-            style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold' }}
-          >
-            Sign up here
-          </span>
-        </p>
       </div>
     </div>
   );
