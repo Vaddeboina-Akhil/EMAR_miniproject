@@ -208,7 +208,7 @@ exports.getAllDoctors = async (req, res) => {
     }
     
     const doctors = await Doctor.find(query)
-      .select('_id doctorId name specialization hospitalName email phone')
+      .select('_id doctorId name specialization hospitalName email phone profileImage')
       .sort({ name: 1 });
     
     console.log(`👨‍⚕️ Found ${doctors.length} verified doctors`);
