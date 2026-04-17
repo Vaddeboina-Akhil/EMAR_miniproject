@@ -9,6 +9,7 @@ router.get('/all', doctorController.getAllDoctors);
 router.use(authMiddleware, roleMiddleware(['doctor']));
 
 router.get('/me', doctorController.getDoctorProfile);
+router.put('/profile', doctorController.updateDoctorProfile);
 router.get('/dashboard', doctorController.getDoctorDashboard);
 router.get('/me/patients', doctorController.getDoctorPatients);
 

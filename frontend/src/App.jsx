@@ -30,6 +30,7 @@ import DoctorPatientProfiles from './pages/doctor/PatientProfiles';
 import DoctorPendingApprovals from './pages/doctor/PendingApprovals';
 import DoctorAddRecord from './pages/doctor/AddRecord';
 import DoctorAccessRequests from './pages/doctor/AccessRequests';
+import EditDoctorProfile from './pages/doctor/EditDoctorProfile';
 
 // Staff
 import StaffLogin from './pages/staff/StaffLogin';
@@ -69,6 +70,7 @@ function App() {
 
       {/* Doctor */}
       <Route path="/doctor/overview" element={<DoctorDashboard />} />
+      <Route path="/doctor/edit-profile" element={<EditDoctorProfile />} />
       <Route path="/doctor/search" element={<DoctorSearchPatient />} />
       <Route path="/doctor/patient-management" element={<DoctorPatientProfiles />} />
       <Route path="/doctor/my-patient/:id" element={<DoctorMyPatientDetails />} />

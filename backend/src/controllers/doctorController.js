@@ -28,6 +28,41 @@ exports.getDoctorProfile = async (req, res) => {
   }
 };
 
+exports.updateDoctorProfile = async (req, res) => {
+  try {
+    const { name, email, phone, dob, age, specialization, hospitalName, profileImage } = req.body;
+    const doctorId = req.user._id || req.user.id;
+
+    // Prepare update object (excluding licenseId and other system fields)
+    const updateData = {
+      name,
+      email,
+      phone,
+      dob,
+      age,
+      specialization,
+      hospitalName
+    };
+
+    // Only include profileImage if provided
+    if (profileImage) {
+      updateData.profileImage = profileImage;
+    }
+
+    const doctor = await Doctor.findByIdAndUpdate(
+      doctorId,
+      updateData,
+      { new: true }
+    ).select('-password');
+
+    if (!doctor) return res.status(404).json({ message: 'Doctor not found' });
+
+    res.json({ doctor });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getDoctorDashboard = async (req, res) => {
   try {
     const doctor = await getDoctor(req.user.id);

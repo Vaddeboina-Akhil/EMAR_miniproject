@@ -27,6 +27,7 @@ const DoctorLayout = ({ children, activePage = 'Dashboard' }) => {
     { label: 'Pending Approvals',  icon: '📋', path: '/doctor/pending-approvals' },
     { label: 'Add Prescription',   icon: '💊', path: '/doctor/add-record' },
     { label: 'Access Requests',    icon: '🔐', path: '/doctor/access-requests' },
+    { label: 'Edit Profile',       icon: '⚙️',  path: '/doctor/edit-profile' },
   ];
 
   const handleLogout = () => {
