@@ -64,6 +64,16 @@ const DoctorDashboard = () => {
     if (user?._id) {
       fetchStats();
     }
+    
+    // Refetch when page becomes visible (user navigates back)
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user?._id) {
+        fetchStats();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [user?._id]);
 
   const formatRelativeTime = (dateStr) => {
@@ -94,7 +104,9 @@ const DoctorDashboard = () => {
       try {
         const pendingRes = await api.get('/doctors/pending-records');
         pendingRecordsData = Array.isArray(pendingRes?.records) ? pendingRes.records : [];
-        setPendingRecords(pendingRecordsData.slice(0, 3));
+        // Filter to only show pending status records
+        const filteredPending = pendingRecordsData.filter(r => r.status === 'pending');
+        setPendingRecords(filteredPending.slice(0, 3));
       } catch (e) {
         console.warn('Failed to fetch pending records:', e.message);
         setPendingRecords([]);
@@ -288,6 +300,7 @@ const DoctorDashboard = () => {
         </div>
       )}
       {!loading && pendingRecords.map((rec, i) => (
+        rec.status === 'pending' ? (
         <div key={rec._id || i} style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '12px' : '0', padding: '14px 16px', backgroundColor: '#FAFAFA', borderRadius: '12px', marginBottom: '8px', border: '1px solid #f0f0f0' }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontWeight: 'bold', fontSize: isMobile ? '14px' : '15px', wordBreak: 'break-word' }}>{rec.patientName || 'Unknown Patient'}</div>
@@ -298,6 +311,7 @@ const DoctorDashboard = () => {
             <button onClick={() => navigate('/doctor/pending-approvals')} style={{ backgroundColor: '#1A237E', color: 'white', border: 'none', borderRadius: '8px', padding: '6px 14px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', flex: isMobile ? 1 : 'none', minHeight: '44px' }}>Review</button>
           </div>
         </div>
+        ) : null
       ))}
     </div>
   );
